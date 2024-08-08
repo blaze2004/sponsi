@@ -1,0 +1,6 @@
+<button id="theme-toggle">
+    <img class="dark:hidden h-4 w-4" src="{{ url_for('static',filename='src/icons/moon.svg') }}" alt="moon icon" />
+    <img class="hidden dark:block h-4 w-4" src="{{ url_for('static', filename='src/icons/sun.svg') }}" alt="sun icon" />
+</button>
+
+<script src="{{url_for('static',filename='src/js/theme.js')}}"></script>

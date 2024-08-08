@@ -1,0 +1,20 @@
+{% extends 'layout/base.html' %}
+
+{% block head %}
+<title>Sponsi - Get Started</title>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center p-2 min-h-screen">
+    <div class="w-full max-w-md">
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div class="flex flex-col space-y-1.5 p-6">
+                <h3 class="text-2xl font-semibold leading-none tracking-tight">{% block title %}{% endblock %}</h3>
+            </div>
+            <div class="p-6 pt-0">
+                {% block form %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
