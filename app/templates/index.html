@@ -2,4 +2,19 @@
 
 {% block content %}
 
+<div class="snap-y">
+    <div class="flex flex-col items-center justify-center pt-16 min-h-screen snap-always snap-center">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-center mb-8 max-w-screen-md">
+            Connecting brands with creators.
+        </h1>
+        <p class="text-lg sm:text-xl md:text-2xl text-muted-foreground text-center mb-4 max-w-screen-sm">
+            Sponsi is a platform that connects brands with creators to create authentic and engaging content.
+        </p>
+        <a href="{{ url_for('auth.login') }}" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+            Get Started
+        </a>
+    </div>
+</div>
+
+
 {% endblock %}

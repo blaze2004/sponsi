@@ -1,4 +1,4 @@
-<nav class="bg-white dark:bg-gray-800 antialiased fixed top-0 w-full">
+<nav class="antialiased fixed top-0 w-full backdrop-blur-xl border-b">
     <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0 py-4">
         <div class="flex items-center justify-between">
 
@@ -10,37 +10,9 @@
                         <h4 class="scroll-m-20 text-xl font-semibold tracking-tight">Sponsi</h4>
                     </a>
                 </div>
-
-                <ul class="hidden lg:flex items-center justify-start gap-6 md:gap-8 py-3 sm:justify-center">
-                    <li>
-                        <a href="#" title="" class="flex text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
-                            Home
-                        </a>
-                    </li>
-                    <li class="shrink-0">
-                        <a href="#" title="" class="flex text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
-                            Best Sellers
-                        </a>
-                    </li>
-                    <li class="shrink-0">
-                        <a href="#" title="" class="flex text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
-                            Gift Ideas
-                        </a>
-                    </li>
-                    <li class="shrink-0">
-                        <a href="#" title="" class="text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
-                            Today's Deals
-                        </a>
-                    </li>
-                    <li class="shrink-0">
-                        <a href="#" title="" class="text-sm font-medium text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-primary-500">
-                            Sell
-                        </a>
-                    </li>
-                </ul>
             </div>
 
-            <div class="flex items-center lg:space-x-2">
+            <div class="flex items-center gap-2">
 
                 <a href="{{ url_for('auth.login') }}" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
                     Get Started
