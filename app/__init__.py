@@ -4,6 +4,7 @@ import os
 from uuid import uuid4
 from flask import Flask
 from dotenv import load_dotenv
+from app.middleware import middleware
 from app.utils import db, login_manager
 
 load_dotenv()
@@ -18,6 +19,10 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+
+    @app.before_request
+    def before_request():
+        return middleware()
 
     from app.views import main, auth  # pylint: disable=import-outside-toplevel
 

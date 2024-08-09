@@ -9,3 +9,8 @@ main = Blueprint("main", __name__)
 def index():
     """Render the landing page."""
     return render_template("index.html")
+
+@main.route("/dashboard")
+def dashboard():
+    """Render the dashboard according to user role."""
+    return render_template("index.html")
