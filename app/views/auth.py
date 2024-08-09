@@ -5,13 +5,13 @@ from flask import Blueprint, render_template
 auth = Blueprint("auth", __name__)
 
 
-@auth.route("/login")
-def login():
-    """Render the login page."""
-    return render_template("auth/login.html")
+@auth.route("/signin")
+def signin():
+    """Render the Sign In page."""
+    return render_template("auth/signin.html")
 
 
-@auth.route("/register")
-def register():
-    """Render the register page."""
-    return render_template("auth/register.html")
+@auth.route("/signup")
+def signup():
+    """Render the Sign Up page."""
+    return render_template("auth/signup.html")

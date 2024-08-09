@@ -5,12 +5,19 @@
     {% block head %}{% endblock %}
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/globals.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/globals.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/ui.css')}}">
 </head>
 
 <body>
     {% include 'ui/nav.html' %}
-    {% block content %}{% endblock %}
+    <div style="padding-top: 5.2rem;">
+        {% block content %}{% endblock %}
+    </div>
+    {% include 'layout/footer.html' %}
+    <script src="{{url_for('static',filename='js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static',filename='js/globals.js')}}"></script>
 </body>
 
 </html>

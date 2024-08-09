@@ -1,16 +1,22 @@
 {% extends 'layout/base.html' %}
 
+{% block head %}
+<title>Sponsi - Connecting Sponsors and Influencers</title>
+{% endblock %}
+
 {% block content %}
 
-<div class="snap-y">
-    <div class="flex flex-col items-center justify-center pt-16 min-h-screen snap-always snap-center">
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-center mb-8 max-w-screen-md">
+<div>
+    <div class="d-flex flex-column align-items-center justify-content-center pt-16 min-h-screen">
+        <h1 class="fs-1 fw-bold text-center mb-4 mx-auto max-w-screen-md">
             Connecting brands with creators.
         </h1>
-        <p class="text-lg sm:text-xl md:text-2xl text-muted-foreground text-center mb-4 max-w-screen-sm">
-            Sponsi is a platform that connects brands with creators to create authentic and engaging content.
+
+        <p class="lead text-center mb-3 mx-auto max-w-screen-sm">
+            Sponsi is a platform to connect brands with creators to create authentic and engaging content.
         </p>
-        <a href="{{ url_for('auth.login') }}" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+
+        <a href="{{ url_for('auth.signin') }}" class="btn btn-primary">
             Get Started
         </a>
     </div>

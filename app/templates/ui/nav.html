@@ -1,20 +1,16 @@
-<nav class="antialiased fixed top-0 w-full backdrop-blur-xl border-b">
-    <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0 py-4">
-        <div class="flex items-center justify-between">
+<nav class="fixed-top border-bottom backdrop-blur-xl w-full">
+    <div class="container-xl px-4 mx-auto px-xxl-0 py-3 max-w-screen-xl">
+        <div class="d-flex align-items-center justify-content-between">
 
-            <div class="flex items-center space-x-8">
-                <div class="shrink-0">
-                    <a href="/" title="" class="flex gap-2 items-center justify-center">
-                        <img class="block w-auto h-8 dark:hidden" src="{{ url_for('static', filename='/src/images/logo.png') }}" alt="logo">
-                        <img class="hidden w-auto h-8 dark:block" src="{{ url_for('static', filename='/src/images/logo-dark.png') }}" alt="logo">
-                        <h4 class="scroll-m-20 text-xl font-semibold tracking-tight">Sponsi</h4>
-                    </a>
-                </div>
-            </div>
+            <a href="/" class="d-flex gap-3 aign-items-center justify-content-center text-foreground hover:text-muted-foreground dark:hover:text-light">
+                <img class="dark:d-none h-8 w-auto" src="{{ url_for('static', filename='images/logo.png') }}" alt="logo">
+                <img class="d-none dark:d-inline-block h-8 w-auto" src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="logo">
+                <h4 class="fs-2 fw-semibold px-2">Sponsi</h4>
+            </a>
 
-            <div class="flex items-center gap-2">
+            <div>
 
-                <a href="{{ url_for('auth.login') }}" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                <a href="{{ url_for('auth.signin') }}" class="btn btn-primary">
                     Get Started
                 </a>
 
