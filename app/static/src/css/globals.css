@@ -68,6 +68,10 @@ body {
   background-color: hsl(var(--background)) !important;
 }
 
+.bg-transparent {
+  background-color: transparent !important;
+}
+
 .text-foreground {
   color: hsl(var(--foreground)) !important;
 }

@@ -3,10 +3,9 @@
 import os
 from uuid import uuid4
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from app.utils import db, login_manager
 
-db = SQLAlchemy()
 load_dotenv()
 
 
@@ -18,8 +17,9 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
 
     db.init_app(app)
+    login_manager.init_app(app)
 
-    from .views import main, auth # pylint: disable=import-outside-toplevel
+    from app.views import main, auth  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix="/auth")

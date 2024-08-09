@@ -1,6 +1,6 @@
-<button id="theme-toggle" class="btn dark:btn-dark">
+<button id="theme-toggle" class="btn btn-light dark:btn-dark">
     <img class="dark:d-none h-4 w-4" src="{{ url_for('static',filename='icons/moon.svg') }}" alt="moon icon" />
-    <img class="d-none dark:d-inline h-4 w-4" src="{{ url_for('static', filename='icons/sun.svg') }}" alt="sun icon" />
+    <img class="light:d-none dark:d-inline h-4 w-4" src="{{ url_for('static', filename='icons/sun.svg') }}" alt="sun icon" />
 </button>
 
-<script src="{{url_for('static',filename='js/theme.js')}}"></script>
+<script src="{{url_for('static',filename='src/js/theme.js')}}"></script>
