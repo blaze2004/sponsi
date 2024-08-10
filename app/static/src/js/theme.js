@@ -5,8 +5,10 @@ const applyTheme=(theme) => {
 
     if (darkModeEnabled) {
         document.documentElement.classList.add('dark');
+        document.documentElement.dataset.bsTheme='dark';
     } else {
         document.documentElement.classList.remove('dark');
+        document.documentElement.dataset.bsTheme='light';
     }
 
     const darkElements=document.querySelectorAll('[class*="dark:"]');

@@ -50,4 +50,7 @@ def dashboard():
                 }
             )
         return render_template("dashboard/admin.html", users=users_data)
+
+    if current_user.role == UserRole.SPONSOR:
+        return render_template("dashboard/sponsor.html")
     return render_template("dashboard.html")
