@@ -40,6 +40,7 @@ class User(UserMixin, db.Model):
     about = db.Column(db.Text, default="")
     flagged = db.Column(db.Boolean, default=False)
     flagged_reason = db.Column(db.Text, default="")
+    onboarded = db.Column(db.Boolean, default=False)
 
     # Sponsor-specific fields
     company_name = db.Column(db.Text)

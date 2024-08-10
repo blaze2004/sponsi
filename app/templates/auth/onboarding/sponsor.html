@@ -1,0 +1,22 @@
+{% extends 'layout/form.html' %}
+
+{% block title %}Sponsor Onboarding{% endblock %}
+{% block form %}
+<form method="POST">
+    <div class="mb-4">
+        <label for="companyName" class="block fw-medium mb-2">Company Name</label>
+        <input type="text" required name="companyName" placeholder="Company Name" aria-label="Company Name" class="input">
+    </div>
+    <div class="mb-4">
+        <label for="industry" class="block fw-medium mb-2">Industry</label>
+        <input type="text" required name="industry" placeholder="Industry" aria-label="Industry" class="input">
+    </div>
+    <div class="mb-4">
+        <label for="website" class="block fw-medium mb-2">Website</label>
+        <input type="text" required name="website" placeholder="Website" aria-label="Website" class="input">
+    </div>
+    <div class="mb-4">
+        <button type="submit" class="w-full btn btn-primary btn-lg">Continue</button>
+    </div>
+</form>
+{% endblock %}

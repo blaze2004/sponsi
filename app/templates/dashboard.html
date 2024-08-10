@@ -1,0 +1,7 @@
+{% extends 'layout/public_layout.html' %}
+
+{% block content %}
+<form action="{{ url_for('auth.signout') }}" method="post">
+    <button type="submit" class="btn btn-primary">Logout</button>
+</form>
+{% endblock %}

@@ -13,4 +13,4 @@ def index():
 @main.route("/dashboard")
 def dashboard():
     """Render the dashboard according to user role."""
-    return render_template("index.html")
+    return render_template("dashboard.html")
