@@ -53,4 +53,4 @@ def dashboard():
 
     if current_user.role == UserRole.SPONSOR:
         return render_template("dashboard/sponsor.html")
-    return render_template("dashboard.html")
+    return render_template("dashboard/influencer.html")
