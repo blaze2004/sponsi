@@ -5,6 +5,7 @@ from enum import Enum
 import uuid
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.models.campaigns import Campaign
 from app.utils import db, login_manager
 
 
@@ -47,6 +48,7 @@ class User(UserMixin, db.Model):
     # Sponsor-specific fields
     company_name = db.Column(db.Text)
     industry = db.Column(db.Text)
+    campaigns = db.relationship(Campaign, backref="user", lazy=True)
 
     # Influencer-specific fields
     platforms = db.relationship("PlatformPresence", backref="user", lazy=True)
