@@ -2,9 +2,14 @@
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from app.forms.auth import SignUpForm
+from app.forms.auth import (
+    AdminOnboardingForm,
+    InfluencerOnboardingForm,
+    SignUpForm,
+    SponsorOnboardingForm,
+)
 from app.utils import db
-from app.models.user import User, UserRole
+from app.models.user import PlatformPresence, User, UserRole
 
 auth = Blueprint("auth", __name__)
 
@@ -41,8 +46,9 @@ def signin():
 def signup():
     """Render the Sign Up page."""
 
+    form = SignUpForm(request.form)
+
     if request.method == "POST":
-        form = SignUpForm(request.form)
         if form.validate():
             user_exists = db.session.execute(
                 db.select(User).where(User.email == form.email.data)
@@ -67,7 +73,7 @@ def signup():
             error_msg = form.errors.popitem()[1][-1]
             flash(error_msg, "danger")
 
-    return render_template("auth/signup.html")
+    return render_template("auth/signup.html", data=form.data)
 
 
 @auth.route("/signout", methods=["POST"])
@@ -86,5 +92,66 @@ def onboarding():
         return redirect(url_for("main.dashboard"))
 
     if current_user.role == UserRole.SPONSOR:
-        return render_template("auth/onboarding/sponsor.html")
-    return render_template("auth/onboarding.html")
+        form = SponsorOnboardingForm(request.form)
+        if request.method == "POST":
+            if form.validate():
+                current_user.company_name = form.company_name.data
+                current_user.industry = form.industry.data
+                current_user.website = form.website.data
+                current_user.onboarded = True
+                db.session.commit()
+                flash("User updated successfully.", "success")
+                return redirect(url_for("main.dashboard"))
+            error_msg = form.errors.popitem()[1][-1]
+            flash(error_msg, "danger")
+        return render_template("auth/onboarding/sponsor.html", data=form.data)
+
+    if current_user.role == UserRole.INFLUENCER:
+        form = InfluencerOnboardingForm(request.form)
+
+        if request.method == "POST":
+            if form.validate():
+                current_user.niche = form.niche.data
+                current_user.audience_size = form.audience_size.data
+                current_user.website = form.website.data
+
+                for platform in form.platforms.data:
+                    db.session.add(
+                        PlatformPresence(
+                            user_id=current_user.id,
+                            platform=platform["platform"],
+                            username=platform["username"],
+                            url=platform["url"],
+                            followers=platform["followers"],
+                        )
+                    )
+
+                current_user.onboarded = True
+                db.session.commit()
+                flash("User updated successfully.", "success")
+                return redirect(url_for("main.dashboard"))
+
+            error = form.errors.popitem()
+            if error[0] == "platforms":
+                error_msg = error[1][0].popitem()[1][-1]
+            else:
+                error_msg = error[1][-1]
+            flash(error_msg, "danger")
+        return render_template("auth/onboarding/influencer.html", data=form.data)
+
+    # Admin onboarding (Admin and SuperAdmin users need to reset their password on first login)
+    form = AdminOnboardingForm(request.form)
+
+    if request.method == "POST":
+        if form.validate():
+            if current_user.check_password(form.password.data):
+                flash("Password cannot be the same as the previous one.", "danger")
+            else:
+                current_user.set_password(form.password.data)
+                current_user.onboarded = True
+                db.session.commit()
+                flash("Password updated successfully.", "success")
+                return redirect(url_for("main.dashboard"))
+        error_msg = form.errors.popitem()[1][-1]
+        flash(error_msg, "danger")
+    return render_template("auth/onboarding/admin.html", data=form.data)

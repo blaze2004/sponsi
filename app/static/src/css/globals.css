@@ -221,6 +221,10 @@ body {
   max-width: 640px;
 }
 
+.min-w-sm {
+  min-width: 24rem;
+}
+
 .max-w-md {
   max-width: 28rem;
 }

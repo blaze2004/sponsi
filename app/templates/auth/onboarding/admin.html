@@ -1,0 +1,18 @@
+{% extends 'layout/form.html' %}
+
+{% block title %}Update Password{% endblock %}
+{% block form %}
+<form method="POST">
+    <div class="mb-4">
+        <label for="password" class="d-block fw-medium mb-2">New Password</label>
+        <input type="password" required name="password" placeholder="Password" aria-label="Password" class="input" {% if data.password %} value="{{ data.password }}" {% endif %}>
+    </div>
+    <div class="mb-4">
+        <label for="password2" class="d-block fw-medium mb-2">Confirm Password</label>
+        <input type="password" required name="password2" placeholder="Confirm Password" aria-label="Confirm Password" class="input" {% if data.password2 %} value="{{ data.password2 }}" {% endif %}>
+    </div>
+    <div class="mb-4">
+        <button type="submit" class="w-full btn btn-primary btn-lg">Continue</button>
+    </div>
+</form>
+{% endblock %}

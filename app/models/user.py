@@ -2,6 +2,7 @@
 
 import os
 from enum import Enum
+import uuid
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils import db, login_manager
@@ -41,6 +42,7 @@ class User(UserMixin, db.Model):
     flagged = db.Column(db.Boolean, default=False)
     flagged_reason = db.Column(db.Text, default="")
     onboarded = db.Column(db.Boolean, default=False)
+    website = db.Column(db.Text)
 
     # Sponsor-specific fields
     company_name = db.Column(db.Text)
@@ -80,13 +82,11 @@ def create_superadmin():
             role=UserRole.SUPERADMIN,
         )
 
-        password = os.environ.get("SUPERADMIN_PASSWORD")
-
-        if not password:
-            raise ValueError("SUPERADMIN_PASSWORD environment variable not set.")
+        password = uuid.uuid4().hex
 
         print("Creating superadmin user...")
         print("Email:", superadmin.email)
+        print("Password:", password)
         superadmin.set_password(password=password)
         db.session.add(superadmin)
         db.session.commit()

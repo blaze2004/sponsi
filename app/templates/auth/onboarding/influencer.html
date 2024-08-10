@@ -1,0 +1,80 @@
+{% extends 'layout/form.html' %}
+
+{% block title %}Influencer Onboarding{% endblock %}
+{% block form %}
+<form method="POST">
+    <div class="mb-4">
+        <label for="niche" class="d-block fw-medium mb-2">What's your Niche?</label>
+        <input type="text" required name="niche" placeholder="Niche" aria-label="Niche" class="input" {% if data.niche %} value="{{ data.niche }}" {% endif %}>
+    </div>
+    <div class="mb-4">
+        <label class="d-block fw-medium mb-2">Platform Presence</label>
+        <div class="position-relative">
+            <div id="platformPresenceList" class="d-flex w-full overflow-x-scroll gap-2" style="scroll-behavior: smooth;">
+                {% for platform in data.platforms %}
+                <div class="platform-entry p-2 w-full min-w-sm">
+                    <div class="d-flex flex-column w-full gap-2">
+                        <input type="text" name="platforms-{{ loop.index0 }}-platform" placeholder="Platform" {% if platform.platform %} value="{{ platform.platform }}" {% endif %} required class="input">
+                        <input type="text" name="platforms-{{ loop.index0 }}-username" placeholder="Username" {% if platform.username %} value="{{ platform.username }}" {% endif %} required class="input">
+                        <input type="url" name="platforms-{{ loop.index0 }}-url" placeholder="Profile URL" {% if platform.url %} value="{{ platform.url }}" {% endif %} required class="input">
+                        <input type="number" name="platforms-{{ loop.index0 }}-followers" placeholder="Followers" {% if platform.followers %} value="{{ platform.followers }}" {% endif %} required class="input">
+                        <button type="button" class="btn btn-danger remove-platform">Remove</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="button" id="addPlatform" class="btn btn-secondary mt-2">Add Platform</button>
+    </div>
+    <div class="mb-4">
+        <label for="audience_size" class="d-block fw-medium mb-2">Overall Followers count</label>
+        <input type="number" required name="audience_size" placeholder="Overall Followers count" aria-label="audience_size" class="input" {% if data.audience_size %} value="{{ data.audience_size }}" {% endif %}>
+    </div>
+    <div class="mb-4">
+        <label for="website" class="d-block fw-medium mb-2">Portfolio Website</label>
+        <input type="text" required name="website" placeholder="Website" aria-label="Website" class="input" {% if data.website %} value="{{ data.website }}" {% endif %}>
+    </div>
+    <div class="mb-4">
+        <button type="submit" class="w-full btn btn-primary btn-lg">Continue</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const platformList=document.getElementById('platformPresenceList');
+        const addButton=document.getElementById('addPlatform');
+        let platformCount=platformList.children.length||0;
+
+        function createPlatformEntry() {
+            const entry=document.createElement('div');
+            entry.className='platform-entry p-2 w-full min-w-sm';
+            entry.innerHTML=`
+                <div class="d-flex flex-column w-full gap-2">
+                    <input type="text" name="platforms-${platformCount}-platform" placeholder="Platform" required class="input">
+                    <input type="text" name="platforms-${platformCount}-username" placeholder="Username" required class="input">
+                    <input type="url" name="platforms-${platformCount}-url" placeholder="Profile URL" required class="input">
+                    <input type="number" name="platforms-${platformCount}-followers" placeholder="Followers" required class="input">
+                    <button type="button" class="btn btn-danger remove-platform">Remove</button>
+                </div>
+            `;
+            platformCount++;
+            return entry;
+        }
+
+        addButton.addEventListener('click', function () {
+            platformList.appendChild(createPlatformEntry());
+            platformList.scrollTo({ left: platformList.scrollWidth, behavior: 'smooth' });
+        });
+
+        platformList.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-platform')) {
+                e.target.closest('.platform-entry').remove();
+            }
+        });
+
+        if (platformCount===0) {
+            platformList.appendChild(createPlatformEntry());
+        }
+    });
+</script>
+{% endblock %}
