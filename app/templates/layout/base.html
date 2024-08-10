@@ -11,7 +11,10 @@
 </head>
 
 <body>
-    {% block children %}{% endblock %}
+    {% include 'ui/nav.html' %}
+    <div style="padding-top: 5.2rem;">
+        {% block content %}{% endblock %}
+    </div>
     {% include 'layout/footer.html' %}
     <script src="{{url_for('static',filename='js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{url_for('static',filename='src/js/globals.js')}}"></script>

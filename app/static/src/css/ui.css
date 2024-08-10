@@ -63,3 +63,46 @@ a:focus {
     cursor: not-allowed;
     opacity: 0.5;
 }
+
+.accordion-button {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+    transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem hsl(var(--ring));
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+}
+
+.accordion-body {
+    background-color: hsl(var(--card)) !important;
+    color: hsl(var(--card-foreground)) !important;
+    padding: 1rem !important;
+    border-top: 1px solid hsl(var(--border)) !important;
+}
+
+.accordion-item .accordion-button.collapsed {
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+}
+
+.dark .accordion-button {
+    background-color: hsl(var(--secondary)) !important;
+    color: hsl(var(--secondary-foreground)) !important;
+}
+
+.dark .accordion-button:not(.collapsed) {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+}
+
+.dark .accordion-body {
+    background-color: hsl(var(--card)) !important;
+    color: hsl(var(--card-foreground)) !important;
+    border-color: hsl(var(--border)) !important;
+}

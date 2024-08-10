@@ -1,0 +1,134 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center min-h-screen p-2">
+    <div class="d-flex flex-column align-items-center align-items-md-start justify-content-center max-w-screen-xl w-full">
+        <h1 class="fs-1 fw-bold text-center mb-4">
+            Welcome, {{ current_user.name }}
+        </h1>
+
+        <p class="lead text-center mb-3">
+            Welcome to the admin dashboard
+        </p>
+
+        <ul class="nav nav-tabs w-full" role="tablist">
+            <li class="nav-item p-2" role="presentation">
+                <button class="btn btn-ghost active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">Users</button>
+            </li>
+            <li class="nav-item p-2" role="presentation">
+                <button class="btn btn-ghost" id="campaigns-tab" data-bs-toggle="tab" data-bs-target="#campaigns-tab-pane" type="button" role="tab" aria-controls="campaigns-tab-pane" aria-selected="false">Campaigns</button>
+            </li>
+        </ul>
+
+        <div class="tab-content w-full mt-2">
+            <div class="tab-pane fade show active w-full" id="users-tab-pane" role="tabpanel" aria-labelledby="users-tab" tabindex="0">
+                <div class="accordion w-full" id="users-list-accordion">
+                    {% for user in users %}
+                    <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ user.id }}" aria-controls="collapse-{{ user.id }}" aria-expanded="false">
+                                {{ user.name }}
+                                <span class="badge text-bg-info rounded-pill">{{ user.email }}</span>
+                                <span class="badge text-bg-warning rounded-pill">{{ user.role }}</span>
+                                {% if user.flagged %}
+                                <span class="badge bg-danger rounded-pill">Flagged</span>
+                                {% endif %}
+                            </button>
+                        </h2>
+                        <div id="collapse-{{ user.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#users-list-accordion">
+                            <div class="accordion-body">
+                                <p>
+                                    <strong>Name:</strong> {{ user.name }}
+                                </p>
+                                <p>
+                                    <strong>Email:</strong> {{ user.email }}
+                                </p>
+                                <p>
+                                    <strong>Role:</strong> <span class="badge text-bg-warning rounded-pill">{{ user.role }}</span>
+                                </p>
+
+                                {% if user.about %}
+                                <p>
+                                    <strong>About:</strong> {{ user.about }}
+                                </p>
+                                {% endif %}
+
+                                {% if user.flagged %}
+                                <p>
+                                    <strong>Flagged:</strong> <span class="badge bg-danger rounded-pill">{{ user.flagged }}</span>
+                                </p>
+                                <p>
+                                    <strong>Flagged reason:</strong> {{ user.flagged_reason }}
+                                </p>
+                                {% endif %}
+
+                                <p>
+                                    <strong>Onboarded:</strong> {{ user.onboarded }}
+                                </p>
+
+                                {% if user.website %}
+                                <p>
+                                    <strong>Website:</strong> {{ user.website }}
+                                </p>
+                                {% endif %}
+
+                                {% if user.company_name %}
+                                <p>
+                                    <strong>Company:</strong> {{ user.company_name }}
+                                </p>
+                                {% endif %}
+
+                                {% if user.industry %}
+                                <p>
+                                    <strong>Industry:</strong> {{ user.industry }}
+                                </p>
+                                {% endif %}
+
+                                {% if user.niche %}
+                                <p>
+                                    <strong>Niche:</strong> {{ user.niche }}
+                                </p>
+                                {% endif %}
+
+                                {% if user.audience_size %}
+                                <p>
+                                    <strong>Audience size:</strong> {{ user.audience_size }}
+                                </p>
+                                {% endif %}
+
+                                {% if user.platforms %}
+                                <p>
+                                    <strong>Platforms presence:</strong>
+                                <ul>
+                                    {% for platform in user.platforms %}
+                                    <li>
+                                        <p><strong>Platform: </strong>{{ platform.platform }}</p>
+                                        <p><strong>Username: </strong>{{ platform.username }}</p>
+                                        <p><strong>Profile url: </strong>{{ platform.url }}</p>
+                                        <p><strong>Followers Count: </strong>{{ platform.followers }}</p>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                </p>
+                                {% endif %}
+
+                                {% if user.flagged %}
+                                <button class="btn btn-warning">Unflag user</button>
+                                {% else %}
+                                <button class="btn btn-danger">Flag user</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="campaigns-tab-pane" role="tabpanel" aria-labelledby="campaigns-tab" tabindex="0">
+                Campigns
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
