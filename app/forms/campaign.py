@@ -6,7 +6,7 @@ from app.models.campaigns import CampaignVisibility
 
 
 class CreateOrUpdateCampaignForm(Form):
-    """Create Campaign Form"""
+    """Create/Update Campaign Form"""
 
     title = StringField(
         "Title", validators=[validators.DataRequired(message="Title is required.")]
@@ -50,4 +50,30 @@ class CreateOrUpdateCampaignForm(Form):
     )
     goals = StringField(
         "Goals", validators=[validators.DataRequired(message="Goals is required.")]
+    )
+
+
+class CreateOrUpdateAdRequestsForm(Form):
+    """Create/Update Ad Request Form"""
+
+    title = StringField(
+        "Title", validators=[validators.DataRequired(message="Title is required.")]
+    )
+    description = StringField(
+        "Description",
+        validators=[validators.DataRequired(message="Description is required.")],
+    )
+    payment_amount = FloatField(
+        "Payment Amount",
+        validators=[
+            validators.DataRequired(message="Payment Amount is required."),
+            validators.NumberRange(
+                min=10, message="Payment Amount must be at least ₹10"
+            ),
+        ],
+    )
+
+    requirements = StringField(
+        "Requirements",
+        validators=[validators.DataRequired(message="Requirements is required.")],
     )

@@ -4,8 +4,8 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from app.forms.campaign import CreateOrUpdateCampaignForm
-from app.models.campaigns import Campaign, CampaignVisibility
+from app.forms.campaign import CreateOrUpdateAdRequestsForm, CreateOrUpdateCampaignForm
+from app.models.campaigns import AdRequest, Campaign, CampaignVisibility
 from app.models.user import UserRole
 from app.utils import db
 
@@ -137,6 +137,134 @@ def edit_or_delete_campaign(campaign_id):
         db.session.commit()
 
         return {"message": "Campaign updated successfully."}, 200
+
+    error_msg = form.errors.popitem()[1][-1]
+    return {"message": error_msg}, 400
+
+
+@sponsor.route("/campaigns/<int:campaign_id>/ads", methods=["GET", "POST"])
+@login_required
+def campaign_ad_requests(campaign_id):
+    """Get all ads for a campaign."""
+
+    if current_user.role != UserRole.SPONSOR:
+        return redirect(url_for("main.dashboard"))
+
+    campaign = db.session.execute(
+        db.select(Campaign).where(Campaign.id == campaign_id)
+    ).scalar()
+
+    if not campaign:
+        flash("Campaign not found.", "danger")
+        return redirect(url_for("sponsor.campaigns"))
+
+    if campaign.sponsor_id != current_user.id:
+        flash("You are not allowed to perform this action.", "danger")
+        return redirect(url_for("sponsor.campaigns"))
+
+    form = CreateOrUpdateAdRequestsForm(request.form)
+    show_form_modal = False
+
+    if request.method == "POST":
+        if form.validate():
+            ad_request = AdRequest(
+                campaign_id=campaign_id,
+                title=form.title.data,
+                description=form.description.data,
+                payment_amount=form.payment_amount.data,
+                requirements=form.requirements.data,
+            )
+
+            db.session.add(ad_request)
+            db.session.commit()
+            flash("Ad request created successfully.", "success")
+            return redirect(
+                url_for("sponsor.campaign_ad_requests", campaign_id=campaign_id)
+            )
+
+        error_msg = form.errors.popitem()[1][-1]
+        flash(error_msg, "danger")
+        show_form_modal = True
+
+    ad_requests = db.session.execute(
+        db.select(AdRequest).where(AdRequest.campaign_id == campaign_id)
+    ).scalars()
+
+    ad_requests_data = []
+
+    for ad_request in ad_requests:
+        ad_requests_data.append(
+            {
+                "id": ad_request.id,
+                "campaign_id": ad_request.campaign_id,
+                "influencer_id": ad_request.influencer_id,
+                "status": ad_request.status.name,
+                "title": ad_request.title,
+                "description": ad_request.description,
+                "payment_amount": ad_request.payment_amount,
+                "requirements": ad_request.requirements,
+            }
+        )
+
+    return render_template(
+        "sponsor/ad_request.html",
+        data=form.data,
+        campaign=campaign,
+        ad_requests=ad_requests_data,
+        show_form_modal=show_form_modal,
+    )
+
+
+@sponsor.route(
+    "/campaigns/<int:campaign_id>/ads/<int:ad_request_id>", methods=["PUT", "DELETE"]
+)
+@login_required
+def edit_or_delete_ad_request(campaign_id, ad_request_id):
+    """Edit/Delete ad request handler."""
+
+    if current_user.role != UserRole.SPONSOR:
+        return {"message": "You are not allowed to perform this action."}, 403
+
+    if request.method == "DELETE":
+        ad_request = db.session.execute(
+            db.select(AdRequest).where(AdRequest.id == ad_request_id)
+        ).scalar()
+
+        if not ad_request:
+            return {"message": "Ad request not found."}, 404
+
+        if ad_request.campaign.sponsor_id != current_user.id:
+            return {"message": "You are not allowed to perform this action."}, 403
+
+        db.session.delete(ad_request)
+        db.session.commit()
+
+        return {"message": "Ad request deleted successfully."}, 200
+
+    form = CreateOrUpdateAdRequestsForm()
+
+    for key, value in request.json.items():
+        form[key].data = value if key != "payment_amount" else float(value)
+
+    if form.validate():
+        ad_request = db.session.execute(
+            db.select(AdRequest).where(AdRequest.id == ad_request_id)
+        ).scalar()
+
+        if not ad_request:
+            return {"message": "Ad request not found."}, 404
+
+        if ad_request.campaign.sponsor_id != current_user.id:
+            return {"message": "You are not allowed to perform this action."}, 403
+
+        ad_request.title = form.title.data
+        ad_request.description = form.description.data
+        ad_request.payment_amount = form.payment_amount.data
+        ad_request.requirements = form.requirements.data
+
+        db.session.commit()
+
+        return {"message": "Ad request updated successfully."}, 200
 
     error_msg = form.errors.popitem()[1][-1]
     return {"message": error_msg}, 400

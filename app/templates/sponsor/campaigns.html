@@ -115,7 +115,7 @@
                             </div>
                             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal">Delete</button>
                             <button class="btn btn-secondary" onclick='handleEditCampaign({ url: `{{ url_for("sponsor.edit_or_delete_campaign", campaign_id=campaign.id) }}`, data: `{{ campaign | tojson | safe }}`})'>Edit Campaign</button>
-                            <a class="btn btn-primary">Manage Ad Requests</a>
+                            <a class="btn btn-primary" href="{{ url_for('sponsor.campaign_ad_requests', campaign_id=campaign.id) }}">Manage Ad Requests</a>
                         </div>
                     </div>
 
@@ -136,7 +136,6 @@
 <script>
 
     const handleCreateCampaign=() => {
-        console.log('Creating new campaign');
         const createOrUpdateCampaignForm=document.getElementById('create_or_update_campaign_form');
         const createCampaignModel=document.getElementById('createCampaignModel');
         createOrUpdateCampaignForm.onsubmit=null;
@@ -158,10 +157,6 @@
                 element.value='';
             }
         });
-
-        console.log(createOrUpdateCampaignForm.elements);
-
-        console.log("f9ne")
 
         createOrUpdateCampaignForm.querySelector('button[type="submit"]').textContent='Create';
         createCampaignModel.querySelector('.modal-title').textContent='New Campaign';
@@ -190,12 +185,10 @@
         createOrUpdateCampaignForm.onsubmit=async (e) => {
             e.preventDefault();
             const formData=new FormData(createOrUpdateCampaignForm);
-            console.log(Object.fromEntries(formData));
             const formObject={};
             formData.forEach((value, key) => {
                 formObject[key]=value;
             });
-            console.log(formObject);
             await callApi({
                 url: url,
                 loadingElementId: 'create_or_update_campaign_form_submit_button',
