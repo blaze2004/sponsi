@@ -106,3 +106,19 @@ a:focus {
     color: hsl(var(--card-foreground)) !important;
     border-color: hsl(var(--border)) !important;
 }
+
+.loader-container[data-loading=true] .spinner-border {
+    display: block;
+}
+
+.loader-container[data-loading=false] .spinner-border {
+    display: none;
+}
+
+.loader-container[data-loading=true] .children {
+    display: none;
+}
+
+.loader-container[data-loading=false] .children {
+    display: block;
+}

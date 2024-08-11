@@ -84,7 +84,7 @@ def create_superadmin():
             role=UserRole.SUPERADMIN,
         )
 
-        password = uuid.uuid4().hex
+        password = os.environ.get("SUPERADMIN_PASSWORD", uuid.uuid4().hex)
 
         print("Creating superadmin user...")
         print("Email:", superadmin.email)

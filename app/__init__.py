@@ -24,9 +24,10 @@ def create_app():
     def before_request():
         return middleware()
 
-    from app.views import main, auth  # pylint: disable=import-outside-toplevel
+    from app.views import main, auth, admin  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix="/auth")
+    app.register_blueprint(admin, url_prefix="/admin")
 
     return app

@@ -118,9 +118,48 @@
                                 {% endif %}
 
                                 {% if user.flagged %}
-                                <button class="btn btn-warning">Unflag user</button>
+                                <div class="modal" tabindex="-1" id="unFlagUserModal">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-card">
+                                            <div class="modal-body">
+                                                <h5 class="modal-title my-2">Unflag User</h5>
+                                                <div class="my-4">
+                                                    <p class="d-block fw-medium mb-2">Are you sure you want to unflag this user?</p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                                <button id="unflag-user-{{ user.id }}-button" data-loading="false" type="button" class="btn btn-primary loader-container" onclick="callApi({url: `{{ url_for('admin.unflag_user') }}`, loadingElementId: 'unflag-user-{{ user.id }}-button', refreshOnSuccess: true, options: { method: 'POST', body: JSON.stringify({ user_id: '{{ user.id }}' }) }});">
+                                                    <span class="children">UnFlag</span>
+                                                    {% include 'ui/spinner.html' %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#unFlagUserModal">Unflag user</button>
                                 {% else %}
-                                <button class="btn btn-danger">Flag user</button>
+                                <div class="modal" tabindex="-1" id="flagUserModal">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-card">
+                                            <div class="modal-body">
+                                                <h5 class="modal-title my-2">Flag User</h5>
+                                                <div class="my-4">
+                                                    <label for="flagged_reason" class="d-block fw-medium mb-2">Reason</label>
+                                                    <input id="user-flag-reason" type="text" required name="flagged_reason" placeholder="Whatt's the reason for flagging this user?" aria-label="flagged_reason" class="input">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button id="flag-user-{{ user.id }}-button" data-loading="false" type="button" class="btn btn-primary loader-container" onclick="callApi({url: `{{ url_for('admin.flag_user') }}`, loadingElementId: 'flag-user-{{ user.id }}-button', refreshOnSuccess: true, options: { method: 'POST', body: JSON.stringify({ user_id: '{{ user.id }}', flagged_reason: document.getElementById('user-flag-reason').value }) }});">
+                                                    <span class="children">Flag</span>
+                                                    {% include 'ui/spinner.html' %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#flagUserModal">Flag user</button>
                                 {% endif %}
                             </div>
                         </div>
