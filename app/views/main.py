@@ -1,5 +1,6 @@
 """Marketing Pages views."""
 
+from datetime import datetime
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
 from app.models.campaigns import AdRequest, Campaign, CampaignVisibility
@@ -62,8 +63,8 @@ def dashboard():
                     "id": campaign.id,
                     "title": campaign.title,
                     "description": campaign.description,
-                    "start_date": campaign.start_date,
-                    "end_date": campaign.end_date,
+                    "start_date": datetime.strftime(campaign.start_date, "%Y-%m-%d"),
+                    "end_date": datetime.strftime(campaign.end_date, "%Y-%m-%d"),
                     "budget": campaign.budget,
                     "visibility": campaign.visibility.name,
                     "niche": campaign.niche,
@@ -72,17 +73,17 @@ def dashboard():
                     "flagged": campaign.flagged,
                     "flagged_reason": campaign.flagged_reason,
                     "sponsor": {
-                        "id": campaign.sponsor.id,
-                        "name": campaign.sponsor.name,
-                        "email": campaign.sponsor.email,
-                        "role": campaign.sponsor.role.name,
-                        "about": campaign.sponsor.about,
-                        "flagged": campaign.sponsor.flagged,
-                        "flagged_reason": campaign.sponsor.flagged_reason,
-                        "onboarded": campaign.sponsor.onboarded,
-                        "website": campaign.sponsor.website,
-                        "company_name": campaign.sponsor.company_name,
-                        "industry": campaign.sponsor.industry,
+                        "id": campaign.user.id,
+                        "name": campaign.user.name,
+                        "email": campaign.user.email,
+                        "role": campaign.user.role.name,
+                        "about": campaign.user.about,
+                        "flagged": campaign.user.flagged,
+                        "flagged_reason": campaign.user.flagged_reason,
+                        "onboarded": campaign.user.onboarded,
+                        "website": campaign.user.website,
+                        "company_name": campaign.user.company_name,
+                        "industry": campaign.user.industry,
                     },
                 }
             )
@@ -149,6 +150,7 @@ def stats():
                     "visibility": campaign.visibility.name,
                     "flagged": campaign.flagged,
                     "sponsor_id": campaign.sponsor_id,
+                    "sponsor": campaign.user.name,
                 }
             )
 
@@ -180,7 +182,7 @@ def stats():
 
         campaign_distribution_by_sponsor = {}
         for campaign in campaigns_data:
-            sponsor_id = campaign["sponsor_id"]
+            sponsor_id = str(campaign["sponsor_id"]) + "-" + campaign["sponsor"]
             if sponsor_id not in campaign_distribution_by_sponsor:
                 campaign_distribution_by_sponsor[sponsor_id] = 0
             campaign_distribution_by_sponsor[sponsor_id] += 1
@@ -197,12 +199,17 @@ def stats():
                     "status": ad_request.status.name,
                     "campaign_id": ad_request.campaign_id,
                     "influencer_id": ad_request.influencer_id or "N/A",
+                    "influencer": (
+                        ad_request.influencer.name if ad_request.influencer else "N/A"
+                    ),
                 }
             )
 
         ad_request_distribution_by_influencer = {}
         for ad_request in ad_requests_data:
-            influencer_id = ad_request["influencer_id"]
+            influencer_id = (
+                str(ad_request["influencer_id"]) + "-" + ad_request["influencer"]
+            )
             if influencer_id not in ad_request_distribution_by_influencer:
                 ad_request_distribution_by_influencer[influencer_id] = 0
             ad_request_distribution_by_influencer[influencer_id] += 1

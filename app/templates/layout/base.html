@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='src/css/globals.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='src/css/ui.css')}}">
+    <script src="{{url_for('static',filename='js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static',filename='src/js/globals.js')}}"></script>
+    <script src="{{url_for('static',filename='src/js/api.js')}}"></script>
 </head>
 
 <body>
@@ -18,9 +21,6 @@
         {% block content %}{% endblock %}
     </div>
     {% include 'layout/footer.html' %}
-    <script src="{{url_for('static',filename='js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{url_for('static',filename='src/js/globals.js')}}"></script>
-    <script src="{{url_for('static',filename='src/js/api.js')}}"></script>
 </body>
 
 </html>

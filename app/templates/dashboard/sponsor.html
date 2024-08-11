@@ -1,4 +1,4 @@
-{% extends 'layout/base.html' %}
+{% extends 'layout/sponsor_base.html' %}
 
 {% from "ui/placeholder.html" import placeholder %}
 
@@ -21,7 +21,7 @@
 
         <div class="tab-content w-full mt-2">
             <div class="tab-pane fade show active w-full" id="active-tab-pane" role="tabpanel" aria-labelledby="active-tab" tabindex="0">
-                {{ placeholder('There are no campaigns to display. Add a new campaign to get started.', 'Create Campaign') }}
+                {{ placeholder('There are no campaigns to display. Add a new campaign to get started.', 'Create Campaign', 'sponsor.campaigns') }}
             </div>
             <div class="tab-pane fade" id="requests-tab-pane" role="tabpanel" aria-labelledby="requests-tab" tabindex="0">
                 {{ placeholder('There are no Ad requests to display. Create a new ad request now', 'Create Ad Request') }}

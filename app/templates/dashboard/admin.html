@@ -144,7 +144,7 @@
                                                 <h5 class="modal-title my-2">Flag User</h5>
                                                 <div class="my-4">
                                                     <label for="flagged_reason" class="d-block fw-medium mb-2">Reason</label>
-                                                    <input id="user-flag-reason" type="text" required name="flagged_reason" placeholder="Whatt's the reason for flagging this user?" aria-label="flagged_reason" class="input">
+                                                    <input id="user-flag-reason" type="text" required name="flagged_reason" placeholder="What's the reason for flagging this user?" aria-label="flagged_reason" class="input">
                                                 </div>
                                             </div>
                                             <div class="modal-footer border-0">
@@ -166,15 +166,15 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="campaigns-tab-pane" role="tabpanel" aria-labelledby="campaigns-tab" tabindex="0">
-                <div class="accordion w-full" id="campaign-list-accordion">
+                <div class="accordion w-full" id="campaigns-list-accordion">
                     {% if campaigns|length == 0 %}
-                    {{ placeholder('There are no campaigns to display. Go out and onboard some sponsors.', 'Onboarded Sponsors') }}
+                    {{ placeholder('There are no campaigns to display. Go out and onboard some sponsors.', 'Onboard Sponsors') }}
                     {% endif %}
                     {% for campaign in campaigns %}
                     <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
                         <h2 class="accordion-header">
                             <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ campaign.id }}" aria-controls="collapse-{{ campaign.id }}" aria-expanded="false">
-                                {{ campaign.name }}
+                                {{ campaign.title }}
                                 <span class="badge text-bg-info rounded-pill">{{ campaign.visibility }}</span>
                                 {% if campaign.flagged %}
                                 <span class="badge bg-danger rounded-pill">Flagged</span>
@@ -182,7 +182,100 @@
                             </button>
                         </h2>
 
-                        <div id="collapse-{{ campaign.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#campaign-list-accordion">
+                        <div id="collapse-{{ campaign.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#campaigns-list-accordion">
+                            <div class="accordion-body">
+                                <p>
+                                    <strong>Title:</strong> {{ campaign.title }}
+                                </p>
+                                <p>
+                                    <strong>Description:</strong> {{ campaign.description }}
+                                </p>
+                                <p>
+                                    <strong>Visibility:</strong> <span class="badge text-bg-warning rounded-pill">{{ campaign.visibility }}</span>
+                                </p>
+                                <p>
+                                    <strong>Budget:</strong> <span class="badge text-bg-info rounded-pill">₹ {{ campaign.budget }}</span>
+                                </p>
+                                <p>
+                                    <strong>start_date:</strong> {{ campaign.start_date }}
+                                </p>
+
+                                <p>
+                                    <strong>end_date:</strong> {{ campaign.end_date }}
+                                </p>
+
+                                {% if campaign.flagged %}
+                                <p>
+                                    <strong>Flagged:</strong> <span class="badge bg-danger rounded-pill">{{ campaign.flagged }}</span>
+                                </p>
+                                <p>
+                                    <strong>Flagged reason:</strong> {{ campaign.flagged_reason }}
+                                </p>
+                                {% endif %}
+
+                                <p>
+                                    <strong>Niche:</strong> {{ campaign.niche }}
+                                </p>
+                                <p>
+                                    <strong>Goals:</strong> {{ campaign.goals }}
+                                </p>
+
+                                <p>
+                                    <strong>Sponsor Name:</strong> {{ campaign.sponsor.name }}
+                                </p>
+                                <p>
+                                    <strong>Email:</strong> {{ campaign.sponsor.email }}
+                                </p>
+
+                                <p>
+                                    <strong>Company:</strong> {{ campaign.sponsor.company_name }}
+                                </p>
+
+                                {% if campaign.flagged %}
+                                <div class="modal" tabindex="-1" id="unFlagCampaignModal">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-card">
+                                            <div class="modal-body">
+                                                <h5 class="modal-title my-2">Unflag Campaign</h5>
+                                                <div class="my-4">
+                                                    <p class="d-block fw-medium mb-2">Are you sure you want to unflag this campaign?</p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                                <button id="unflag-campaign-{{ campaign.id }}-button" data-loading="false" type="button" class="btn btn-primary loader-container" onclick="callApi({url: `{{ url_for('admin.unflag_campaign') }}`, loadingElementId: 'unflag-campaign-{{ campaign.id }}-button', refreshOnSuccess: true, options: { method: 'POST', body: JSON.stringify({ campaign_id: '{{ campaign.id }}' }) }});">
+                                                    <span class="children">UnFlag</span>
+                                                    {% include 'ui/spinner.html' %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#unFlagCampaignModal">Unflag campaign</button>
+                                {% else %}
+                                <div class="modal" tabindex="-1" id="flagCampaignModal">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-card">
+                                            <div class="modal-body">
+                                                <h5 class="modal-title my-2">Flag Campaign</h5>
+                                                <div class="my-4">
+                                                    <label for="flagged_reason" class="d-block fw-medium mb-2">Reason</label>
+                                                    <input id="campaign-flag-reason" type="text" required name="flagged_reason" placeholder="What's the reason for flagging this campaign?" aria-label="flagged_reason" class="input">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button id="flag-campaign-{{ campaign.id }}-button" data-loading="false" type="button" class="btn btn-primary loader-container" onclick="callApi({url: `{{ url_for('admin.flag_campaign') }}`, loadingElementId: 'flag-campaign-{{ campaign.id }}-button', refreshOnSuccess: true, options: { method: 'POST', body: JSON.stringify({ campaign_id: '{{ campaign.id }}', flagged_reason: document.getElementById('campaign-flag-reason').value }) }});">
+                                                    <span class="children">Flag</span>
+                                                    {% include 'ui/spinner.html' %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#flagCampaignModal">Flag user</button>
+                                {% endif %}
+                            </div>
                         </div>
 
                     </div>

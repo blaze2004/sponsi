@@ -45,8 +45,15 @@
                 datasets: [{
                     data: Object.values(user_distribution_by_role_data),
                 }],
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'User Distribution by Role',
+                    }
+                }
             }
-
         });
 
         const user_distribution_by_flagged_status=document.getElementById('user_distribution_by_flagged_status').getContext("2d");
@@ -59,8 +66,15 @@
                 datasets: [{
                     data: Object.values(user_distribution_by_flagged_status_data),
                 }],
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'User Distribution by Flagged Status',
+                    }
+                }
             }
-
         });
 
         const campaign_distribution_by_visibility=document.getElementById('campaign_distribution_by_visibility').getContext("2d");
@@ -74,6 +88,14 @@
                     datasets: [{
                         data: Object.values(campaign_distribution_by_visibility_data),
                     }],
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Campaign Distribution by Visibility',
+                        }
+                    }
                 }
             });
         }
@@ -90,6 +112,14 @@
                     datasets: [{
                         data: Object.values(campaign_distribution_by_flagged_status_data),
                     }],
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Campaign Distribution by Flagged Status',
+                        }
+                    }
                 }
             });
         }
@@ -104,8 +134,17 @@
                 data: {
                     labels: Object.keys(campaign_distribution_by_sponsor_data).map((key) => key.charAt(0).toUpperCase()+key.slice(1)),
                     datasets: [{
+                        label: 'Campaigns',
                         data: Object.values(campaign_distribution_by_sponsor_data),
                     }],
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Campaign Distribution by Sponsor',
+                        }
+                    }
                 }
             });
         }
@@ -115,13 +154,24 @@
         const ad_request_distribution_by_influencer_data=JSON.parse('{{ ad_request_distribution_by_influencer | tojson | safe }}');
 
         if (Object.keys(ad_request_distribution_by_influencer_data).length>0) {
+            console.log(ad_request_distribution_by_influencer_data)
+            console.log(Object.keys(ad_request_distribution_by_influencer_data).map((key) => key.charAt(0).toUpperCase()+key.slice(1)))
             new Chart(ad_request_distribution_by_influencer, {
                 type: 'bar',
                 data: {
                     labels: Object.keys(ad_request_distribution_by_influencer_data).map((key) => key.charAt(0).toUpperCase()+key.slice(1)),
                     datasets: [{
+                        label: 'Ad Requests',
                         data: Object.values(ad_request_distribution_by_influencer_data),
                     }],
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Ad Request Distribution by Influencer',
+                        }
+                    }
                 }
             });
         }

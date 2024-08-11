@@ -1,0 +1,53 @@
+{% extends 'layout/sponsor_base.html' %}
+
+{% from "ui/placeholder.html" import placeholder %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center min-h-screen p-2">
+    <div class="d-flex flex-column align-items-center align-items-md-start justify-content-center max-w-screen-xl w-full">
+        <h1 class="fs-1 fw-bold text-center mb-4">
+            Campaigns
+        </h1>
+
+        <div class="modal" tabindex="-1" id="createCampaignModel">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-card">
+                    <div class="modal-body">
+                        <h5 class="modal-title my-2">New Campaign</h5>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        <div class="mt-2">
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        <div class="my-4">
+                            {% include 'sponsor/new_campaign_form.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full mt-2">
+            {{ placeholder('There are no campaigns to display. Add a new campaign to get started.', button="<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#createCampaignModel'>Create Campaign</button>") }}
+        </div>
+    </div>
+</div>
+
+{{ show_form_modal }}
+
+{% if show_form_modal %}
+<script>
+    const createCampaignModel=new bootstrap.Modal(document.getElementById('createCampaignModel'));
+    createCampaignModel.show();
+</script>
+{% endif %}
+
+{% endblock %}
