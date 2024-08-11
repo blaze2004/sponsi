@@ -1,8 +1,6 @@
-{% extends 'layout/base.html' %}
+{% extends 'layout/admin_base.html' %}
 
-{% set custom_nav_links = [
-{'url': url_for('main.dashboard') , 'text': 'Stats'}
-] %}
+{% from "ui/placeholder.html" import placeholder %}
 
 {% block content %}
 
@@ -168,7 +166,28 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="campaigns-tab-pane" role="tabpanel" aria-labelledby="campaigns-tab" tabindex="0">
-                Campigns
+                <div class="accordion w-full" id="campaign-list-accordion">
+                    {% if campaigns|length == 0 %}
+                    {{ placeholder('There are no campaigns to display. Go out and onboard some sponsors.', 'Onboarded Sponsors') }}
+                    {% endif %}
+                    {% for campaign in campaigns %}
+                    <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ campaign.id }}" aria-controls="collapse-{{ campaign.id }}" aria-expanded="false">
+                                {{ campaign.name }}
+                                <span class="badge text-bg-info rounded-pill">{{ campaign.visibility }}</span>
+                                {% if campaign.flagged %}
+                                <span class="badge bg-danger rounded-pill">Flagged</span>
+                                {% endif %}
+                            </button>
+                        </h2>
+
+                        <div id="collapse-{{ campaign.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#campaign-list-accordion">
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

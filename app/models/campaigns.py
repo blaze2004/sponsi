@@ -51,6 +51,8 @@ class Campaign(db.Model):
     goals = db.Column(db.Text, nullable=False)
     sponsor_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
+    flagged = db.Column(db.Boolean, default=False)
+    flagged_reason = db.Column(db.Text, default="")
 
     def __repr__(self) -> str:
         """String representation of the campaign"""

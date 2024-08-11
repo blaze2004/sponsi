@@ -185,6 +185,10 @@ body {
   height: 100vh;
 }
 
+.max-h-md {
+  max-height: 28rem;
+}
+
 .min-h-full {
   min-height: 100%;
 }
