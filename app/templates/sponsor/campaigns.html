@@ -11,7 +11,7 @@
         </h1>
 
         <div class="modal" tabindex="-1" id="createCampaignModel">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content bg-card">
                     <div class="modal-body">
                         <h5 class="modal-title my-2">New Campaign</h5>
@@ -35,13 +35,96 @@
             </div>
         </div>
 
+        {% if campaigns|length != 0 %}
+        <button class='btn btn-primary my-2' onclick="handleCreateCampaign()">Create Campaign</button>
+        {% endif %}
+
         <div class="w-full mt-2">
-            {{ placeholder('There are no campaigns to display. Add a new campaign to get started.', button="<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#createCampaignModel'>Create Campaign</button>") }}
+            <div class="accordion w-full" id="campaigns-list-accordion">
+                {% if campaigns|length == 0 %}
+                {{ placeholder('There are no campaigns to display. Add a new campaign to get started.', button="<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#createCampaignModel'>Create Campaign</button>") }}
+                {% endif %}
+                {% for campaign in campaigns %}
+                <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ campaign.id }}" aria-controls="collapse-{{ campaign.id }}" aria-expanded="false">
+                            {{ campaign.title }}
+                            <span class="badge text-bg-info rounded-pill">{{ campaign.visibility }}</span>
+                            <span class="badge text-bg-warning rounded-pill">{{ campaign.niche }}</span>
+                            {% if campaign.flagged %}
+                            <span class="badge bg-danger rounded-pill">Flagged</span>
+                            {% endif %}
+                        </button>
+                    </h2>
+
+                    <div id="collapse-{{ campaign.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#campaigns-list-accordion">
+                        <div class="accordion-body">
+                            <p>
+                                <strong>Title:</strong> {{ campaign.title }}
+                            </p>
+                            <p>
+                                <strong>Description:</strong> {{ campaign.description }}
+                            </p>
+                            <p>
+                                <strong>Visibility:</strong> <span class="badge text-bg-warning rounded-pill">{{ campaign.visibility }}</span>
+                            </p>
+                            <p>
+                                <strong>Budget:</strong> <span class="badge text-bg-info rounded-pill">₹ {{ campaign.budget }}</span>
+                            </p>
+                            <p>
+                                <strong>start_date:</strong> {{ campaign.start_date }}
+                            </p>
+
+                            <p>
+                                <strong>end_date:</strong> {{ campaign.end_date }}
+                            </p>
+
+                            {% if campaign.flagged %}
+                            <p>
+                                <strong>Flagged:</strong> <span class="badge bg-danger rounded-pill">{{ campaign.flagged }}</span>
+                            </p>
+                            <p>
+                                <strong>Flagged reason:</strong> {{ campaign.flagged_reason }}
+                            </p>
+                            {% endif %}
+
+                            <p>
+                                <strong>Niche:</strong> <span class="badge text-bg-warning rounded-pill">{{ campaign.niche }}</span>
+                            </p>
+                            <p>
+                                <strong>Goals:</strong> {{ campaign.goals }}
+                            </p>
+                            <div class="modal" tabindex="-1" id="deleteCampaignModal">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content bg-card">
+                                        <div class="modal-body">
+                                            <h5 class="modal-title my-2">Delete Campaign</h5>
+                                            <div class="my-4">
+                                                <p>Are you sure you want to delete this campaign?</p>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button id="delete-campaign-{{ campaign.id }}-button" data-loading="false" type="button" class="btn btn-danger loader-container" onclick="callApi({url: `{{ url_for('sponsor.edit_or_delete_campaign', campaign_id=campaign.id) }}`, loadingElementId: 'delete-campaign-{{ campaign.id }}-button', refreshOnSuccess: true, options: { method: 'DELETE' }});">
+                                                <span class="children">Delete</span>
+                                                {% include 'ui/spinner.html' %}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal">Delete</button>
+                            <button class="btn btn-secondary" onclick='handleEditCampaign({ url: `{{ url_for("sponsor.edit_or_delete_campaign", campaign_id=campaign.id) }}`, data: `{{ campaign | tojson | safe }}`})'>Edit Campaign</button>
+                            <a class="btn btn-primary">Manage Ad Requests</a>
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
-
-{{ show_form_modal }}
 
 {% if show_form_modal %}
 <script>
@@ -49,5 +132,86 @@
     createCampaignModel.show();
 </script>
 {% endif %}
+
+<script>
+
+    const handleCreateCampaign=() => {
+        console.log('Creating new campaign');
+        const createOrUpdateCampaignForm=document.getElementById('create_or_update_campaign_form');
+        const createCampaignModel=document.getElementById('createCampaignModel');
+        createOrUpdateCampaignForm.onsubmit=null;
+
+        Object.keys(createOrUpdateCampaignForm.elements).forEach((key) => {
+            const element=createOrUpdateCampaignForm.elements.namedItem(key);
+            if (!element) {
+                return;
+            }
+            if (element.type=='text'||element.type=='number'||element.type=='date') {
+                element.value='';
+            }
+
+            if (element.type=='radio') {
+                element.checked=false;
+            }
+
+            if (element.type=='textarea') {
+                element.value='';
+            }
+        });
+
+        console.log(createOrUpdateCampaignForm.elements);
+
+        console.log("f9ne")
+
+        createOrUpdateCampaignForm.querySelector('button[type="submit"]').textContent='Create';
+        createCampaignModel.querySelector('.modal-title').textContent='New Campaign';
+
+        new bootstrap.Modal(createCampaignModel).show();
+    };
+
+    const handleEditCampaign=({ url, data }) => {
+        data=JSON.parse(data);
+        const createOrUpdateCampaignForm=document.getElementById('create_or_update_campaign_form');
+
+        Object.keys(data).forEach((key) => {
+            const input=createOrUpdateCampaignForm.elements.namedItem(key);
+            if (input) {
+                input.value=data[key];
+            }
+        });
+
+        if (data.visibility=='PRIVATE') {
+            createOrUpdateCampaignForm.elements.namedItem('private').checked=true;
+        } else {
+            createOrUpdateCampaignForm.elements.namedItem('public').checked=true;
+        }
+
+        const createCampaignModel=document.getElementById('createCampaignModel');
+        createOrUpdateCampaignForm.onsubmit=async (e) => {
+            e.preventDefault();
+            const formData=new FormData(createOrUpdateCampaignForm);
+            console.log(Object.fromEntries(formData));
+            const formObject={};
+            formData.forEach((value, key) => {
+                formObject[key]=value;
+            });
+            console.log(formObject);
+            await callApi({
+                url: url,
+                loadingElementId: 'create_or_update_campaign_form_submit_button',
+                options: {
+                    method: 'PUT',
+                    body: JSON.stringify(formObject)
+                },
+                refreshOnSuccess: true
+            });
+        };
+
+        createOrUpdateCampaignForm.querySelector('button[type="submit"]').textContent='Update';
+        createCampaignModel.querySelector('.modal-title').textContent='Edit Campaign';
+
+        new bootstrap.Modal(createCampaignModel).show();
+    }
+</script>
 
 {% endblock %}

@@ -21,6 +21,9 @@
             <li class="nav-item p-2" role="presentation">
                 <button class="btn btn-ghost" id="campaigns-tab" data-bs-toggle="tab" data-bs-target="#campaigns-tab-pane" type="button" role="tab" aria-controls="campaigns-tab-pane" aria-selected="false">Campaigns</button>
             </li>
+            <li class="nav-item p-2" role="presentation">
+                <button class="btn btn-ghost" id="ad-requests-tab" data-bs-toggle="tab" data-bs-target="#ad-requests-tab-pane" type="button" role="tab" aria-controls="ad-requests-tab-pane" aria-selected="false">Ad Requests</button>
+            </li>
         </ul>
 
         <div class="tab-content w-full mt-2">
@@ -176,6 +179,7 @@
                             <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ campaign.id }}" aria-controls="collapse-{{ campaign.id }}" aria-expanded="false">
                                 {{ campaign.title }}
                                 <span class="badge text-bg-info rounded-pill">{{ campaign.visibility }}</span>
+                                <span class="badge text-bg-warning rounded-pill">{{ campaign.niche }}</span>
                                 {% if campaign.flagged %}
                                 <span class="badge bg-danger rounded-pill">Flagged</span>
                                 {% endif %}
@@ -214,7 +218,7 @@
                                 {% endif %}
 
                                 <p>
-                                    <strong>Niche:</strong> {{ campaign.niche }}
+                                    <strong>Niche:</strong> <span class="badge text-bg-warning rounded-pill">{{ campaign.niche }}</span>
                                 </p>
                                 <p>
                                     <strong>Goals:</strong> {{ campaign.goals }}
@@ -278,6 +282,48 @@
                             </div>
                         </div>
 
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="ad-requests-tab-pane" role="tabpanel" aria-labelledby="ad-requests-tab" tabindex="0">
+                <div class="accordion w-full" id="ad-requests-list-accordion">
+                    {% if ad_requests|length == 0 %}
+                    {{ placeholder('There are no ad requests to display. Go out and onboard some sponsors.', 'Onboard Sponsors') }}
+                    {% endif %}
+                    {% for ad_request in ad_requests %}
+                    <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ ad_request.id }}" aria-controls="collapse-{{ ad_request.id }}" aria-expanded="false">
+                                {{ ad_request.title }}
+                                <span class="badge text-bg-info rounded-pill">{{ ad_request.status }}</span>
+                            </button>
+                        </h2>
+
+                        <div id="collapse-{{ ad_request.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#ad-requests-list-accordion">
+                            <div class="accordion-body">
+                                <p>
+                                    <strong>Title:</strong> {{ ad_request.title }}
+                                </p>
+                                <p>
+                                    <strong>Description:</strong> {{ ad_request.description }}
+                                </p>
+                                <p>
+                                    <strong>Status:</strong> <span class="badge text-bg-warning rounded-pill">{{ ad_request.status }}</span>
+                                </p>
+                                <p>
+                                    <strong>Payment Amount:</strong> <span class="badge text-bg-info rounded-pill">₹ {{ ad_request.payment_amount }}</span>
+                                </p>
+                                <p>
+                                    <strong>Campaign Name:</strong> {{ ad_request.campaign }}
+                                </p>
+
+                                <p>
+                                    <strong>Influencer Name:</strong> {{ ad_request.influencer }}
+                                </p>
+
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>

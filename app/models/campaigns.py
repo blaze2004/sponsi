@@ -64,6 +64,8 @@ class AdRequest(db.Model):
 
     __tablename__ = "ad_request"
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=False)
     campaign_id = db.Column(db.Integer, db.ForeignKey("campaign.id"), nullable=False)
     influencer_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     messages = db.relationship("Message", backref="ad_request", lazy=True)

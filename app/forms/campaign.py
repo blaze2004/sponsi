@@ -5,7 +5,7 @@ from wtforms import DateField, FloatField, Form, RadioField, StringField, valida
 from app.models.campaigns import CampaignVisibility
 
 
-class CreateCampaignForm(Form):
+class CreateOrUpdateCampaignForm(Form):
     """Create Campaign Form"""
 
     title = StringField(

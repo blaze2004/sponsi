@@ -143,15 +143,16 @@ def onboarding():
     form = AdminOnboardingForm(request.form)
 
     if request.method == "POST":
+        error_msg = None
         if form.validate():
             if current_user.check_password(form.password.data):
-                flash("Password cannot be the same as the previous one.", "danger")
+                error_msg = "Password cannot be the same as the previous one."
             else:
                 current_user.set_password(form.password.data)
                 current_user.onboarded = True
                 db.session.commit()
                 flash("Password updated successfully.", "success")
                 return redirect(url_for("main.dashboard"))
-        error_msg = form.errors.popitem()[1][-1]
+        error_msg = error_msg or form.errors.popitem()[1][-1]
         flash(error_msg, "danger")
     return render_template("auth/onboarding/admin.html", data=form.data)

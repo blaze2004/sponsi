@@ -87,12 +87,64 @@ def dashboard():
                     },
                 }
             )
+
+        ad_requests = db.session.execute(
+            db.select(AdRequest).order_by(AdRequest.id)
+        ).scalars()
+
+        ad_requests_data = []
+
+        for ad_request in ad_requests:
+            ad_requests_data.append(
+                {
+                    "id": ad_request.id,
+                    "title": ad_request.title,
+                    "description": ad_request.description,
+                    "campaign_id": ad_request.campaign_id,
+                    "campaign": ad_request.campaign.title,
+                    "influencer_id": ad_request.influencer_id,
+                    "influencer": (
+                        ad_request.influencer.name if ad_request.influencer else "N/A"
+                    ),
+                    "payment_amount": ad_request.payment_amount,
+                    "status": ad_request.status.name,
+                }
+            )
+
         return render_template(
-            "dashboard/admin.html", users=users_data, campaigns=campaigns_data
+            "dashboard/admin.html",
+            users=users_data,
+            campaigns=campaigns_data,
+            ad_requests=ad_requests_data,
         )
 
     if current_user.role == UserRole.SPONSOR:
-        return render_template("dashboard/sponsor.html")
+        campaigns = db.session.execute(
+            db.select(Campaign).where(Campaign.sponsor_id == current_user.id)
+        ).scalars()
+
+        campaigns_data = []
+
+        for campaign in campaigns:
+            if campaign.end_date < datetime.now():
+                continue
+            campaigns_data.append(
+                {
+                    "id": campaign.id,
+                    "title": campaign.title,
+                    "description": campaign.description,
+                    "start_date": datetime.strftime(campaign.start_date, "%Y-%m-%d"),
+                    "end_date": datetime.strftime(campaign.end_date, "%Y-%m-%d"),
+                    "budget": campaign.budget,
+                    "visibility": campaign.visibility.name,
+                    "niche": campaign.niche,
+                    "goals": campaign.goals,
+                    "created_at": campaign.created_at,
+                    "flagged": campaign.flagged,
+                    "flagged_reason": campaign.flagged_reason,
+                }
+            )
+        return render_template("dashboard/sponsor.html", campaigns=campaigns_data)
     return render_template("dashboard/influencer.html")
 
 
