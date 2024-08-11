@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 
 from app.forms.campaign import CreateOrUpdateAdRequestsForm, CreateOrUpdateCampaignForm
 from app.models.campaigns import AdRequest, Campaign, CampaignVisibility
-from app.models.user import UserRole
+from app.models.user import User, UserRole
 from app.utils import db
 
 sponsor = Blueprint("sponsor", __name__)
@@ -268,3 +268,104 @@ def edit_or_delete_ad_request(campaign_id, ad_request_id):
 
     error_msg = form.errors.popitem()[1][-1]
     return {"message": error_msg}, 400
+
+
+@sponsor.route("/influencers")
+@login_required
+def influencers():
+    """Get all influencers."""
+
+    if current_user.role != UserRole.SPONSOR:
+        return redirect(url_for("main.dashboard"))
+
+    ad_requests = db.session.execute(
+        db.select(AdRequest)
+        .join(AdRequest.campaign)
+        .where(
+            (Campaign.sponsor_id == current_user.id), (AdRequest.influencer_id == None)
+        )
+    ).scalars()
+
+    ad_requests_data = []
+
+    for ad_request in ad_requests:
+        ad_requests_data.append(
+            {
+                "id": ad_request.id,
+                "campaign_id": ad_request.campaign_id,
+                "influencer_id": ad_request.influencer_id,
+                "title": ad_request.title,
+                "campaign_title": ad_request.campaign.title,
+            }
+        )
+
+    _influencers = db.session.execute(
+        db.select(User).where(
+            (User.role == UserRole.INFLUENCER), (User.flagged == False)
+        )
+    ).scalars()
+
+    influencers_data = []
+
+    for influencer in _influencers:
+        influencers_data.append(
+            {
+                "id": influencer.id,
+                "name": influencer.name,
+                "about": influencer.about,
+                "website": influencer.website,
+                "niche": influencer.niche,
+                "audience_size": influencer.audience_size,
+                "platforms": [
+                    {
+                        "platform": platform.platform,
+                        "username": platform.username,
+                        "url": platform.url,
+                        "followers": platform.followers,
+                    }
+                    for platform in influencer.platforms
+                ],
+            }
+        )
+
+    return render_template(
+        "sponsor/find.html", influencers=influencers_data, ad_requests=ad_requests_data
+    )
+
+
+@sponsor.route("/influencers/<int:influencer_id>/ad-request", methods=["POST"])
+@login_required
+def invite_influencer_to_ad_request(influencer_id):
+    """Invite influencer to ad request handler."""
+
+    if current_user.role != UserRole.SPONSOR:
+        return {"message": "You are not allowed to perform this action."}, 403
+
+    influencer = db.session.execute(
+        db.select(User).where(
+            (User.id == influencer_id), (User.role == UserRole.INFLUENCER)
+        )
+    ).scalar()
+
+    if not influencer:
+        return {"message": "Influencer not found."}, 404
+
+    if influencer.flagged:
+        return {"message": "Influencer is flagged."}, 400
+
+    ad_request_id = request.json.get("ad_request_id")
+
+    ad_request = db.session.execute(
+        db.select(AdRequest).where(AdRequest.id == ad_request_id)
+    ).scalar()
+
+    if not ad_request:
+        return {"message": "Ad request not found."}, 404
+
+    if ad_request.campaign.sponsor_id != current_user.id:
+        return {"message": "You are not allowed to perform this action."}, 403
+
+    ad_request.requested_to_id = influencer_id
+    db.session.commit()
+
+    return {"message": "Successfully sent ad request invite."}, 200

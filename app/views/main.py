@@ -252,7 +252,9 @@ def stats():
                     "campaign_id": ad_request.campaign_id,
                     "influencer_id": ad_request.influencer_id or "N/A",
                     "influencer": (
-                        ad_request.influencer.name if ad_request.influencer else "N/A"
+                        ad_request.influencer.name
+                        if ad_request.influencer
+                        else "No Influencer"
                     ),
                 }
             )
@@ -277,5 +279,83 @@ def stats():
         )
 
     if current_user.role == UserRole.SPONSOR:
-        return render_template("stats/sponsor.html")
+        campaigns = db.session.execute(
+            db.select(Campaign).where(Campaign.sponsor_id == current_user.id)
+        ).scalars()
+
+        campaigns_data = []
+        for campaign in campaigns:
+            campaigns_data.append(
+                {
+                    "id": campaign.id,
+                    "title": campaign.title,
+                    "visibility": campaign.visibility.name,
+                    "flagged": campaign.flagged,
+                }
+            )
+
+        campaign_distribution_by_visibility = {
+            "public": len(
+                [
+                    campaign
+                    for campaign in campaigns_data
+                    if campaign["visibility"] == CampaignVisibility.PUBLIC.name
+                ]
+            ),
+            "private": len(
+                [
+                    campaign
+                    for campaign in campaigns_data
+                    if campaign["visibility"] == CampaignVisibility.PRIVATE.name
+                ]
+            ),
+        }
+
+        campaign_distribution_by_flagged_status = {
+            "flagged": len(
+                [campaign for campaign in campaigns_data if campaign["flagged"]]
+            ),
+            "not_flagged": len(
+                [campaign for campaign in campaigns_data if not campaign["flagged"]]
+            ),
+        }
+
+        ad_requests = db.session.execute(
+            db.select(AdRequest)
+            .join(AdRequest.campaign)
+            .where(Campaign.sponsor_id == current_user.id)
+        ).scalars()
+
+        ad_requests_data = []
+
+        for ad_request in ad_requests:
+            ad_requests_data.append(
+                {
+                    "id": ad_request.id,
+                    "status": ad_request.status.name,
+                    "campaign_id": ad_request.campaign_id,
+                    "influencer_id": ad_request.influencer_id or "N/A",
+                    "influencer": (
+                        ad_request.influencer.name
+                        if ad_request.influencer
+                        else "No Influencer"
+                    ),
+                }
+            )
+
+        ad_request_distribution_by_influencer = {}
+        for ad_request in ad_requests_data:
+            influencer_id = (
+                str(ad_request["influencer_id"]) + "-" + ad_request["influencer"]
+            )
+            if influencer_id not in ad_request_distribution_by_influencer:
+                ad_request_distribution_by_influencer[influencer_id] = 0
+            ad_request_distribution_by_influencer[influencer_id] += 1
+
+        return render_template(
+            "stats/sponsor.html",
+            campaign_distribution_by_visibility=campaign_distribution_by_visibility,
+            campaign_distribution_by_flagged_status=campaign_distribution_by_flagged_status,
+            ad_request_distribution_by_influencer=ad_request_distribution_by_influencer,
+        )
     return render_template("stats/influencer.html")

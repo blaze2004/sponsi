@@ -1,0 +1,143 @@
+{% extends 'layout/sponsor_base.html' %}
+
+{% from "ui/placeholder.html" import placeholder %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center min-h-screen p-2">
+    <div class="d-flex flex-column align-items-center align-items-md-start justify-content-center max-w-screen-xl w-full">
+        <h1 class="fs-1 fw-bold text-center mb-4">
+            Influencers
+        </h1>
+
+        <div class="modal" tabindex="-1" id="sendAdRequestInviteDialog">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content bg-card">
+                    <div class="modal-body">
+                        <h5 class="modal-title my-2">New Ad Request Invite</h5>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        <div class="mt-2">
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        <div>
+
+                            <div class="mb-4">
+                                <label for="ad_request_id" class="d-block fw-medium mb-2">Ad Request</label>
+                                <select id="send_ad_request_invite_ad_request_id" name="ad_request_id" required aria-label="ad_request_id" class="input">
+                                    <option value="" selected disabled>Select Ad Request</option>
+                                    {% for ad_request in ad_requests %}
+                                    <option value="{{ ad_request.id }}">{{ ad_request.title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" id="send_ad_request_invite_influencer_id" name="influencer_id">
+                            </div>
+
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button id="send_ad_request_invite_submit" data-loading="false" type="submit" class="btn btn-primary loader-container" onclick="callApi({ 
+            url: `{{ url_for('sponsor.invite_influencer_to_ad_request', influencer_id=10) }}`.replace('10', parseInt(document.getElementById('send_ad_request_invite_influencer_id').value)), 
+            loadingElementId: 'send_ad_request_invite_submit', 
+            options: { method: 'POST', body: JSON.stringify({ ad_request_id: document.getElementById('send_ad_request_invite_ad_request_id').value }) }
+        })">
+                                    <span class="children">Send Request</span>
+                                    {% include 'ui/spinner.html' %}
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full mt-2">
+            <div class="accordion w-full" id="campaigns-list-accordion">
+                {% if influencers|length == 0 %}
+                {{ placeholder('There are no influencers to display.', 'Invite Influencers') }}
+                {% endif %}
+                {% for influencer in influencers %}
+                <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ influencer.id }}" aria-controls="collapse-{{ influencer.id }}" aria-expanded="false">
+                            {{ influencer.name }}
+                            <span class="badge text-bg-warning rounded-pill">{{ influencer.niche }}</span>
+                            <span class="badge text-bg-info rounded-pill">{{ influencer.audience_size }}+ followers</span>
+                        </button>
+                    </h2>
+
+                    <div id="collapse-{{ influencer.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#campaigns-list-accordion">
+                        <div class="accordion-body">
+                            <p>
+                                <strong>Name:</strong> {{ influencer.name }}
+                            </p>
+
+                            {% if influencer.about %}
+                            <p>
+                                <strong>About:</strong> {{ influencer.about }}
+                            </p>
+                            {% endif %}
+
+                            {% if influencer.website %}
+                            <p>
+                                <strong>Website:</strong> {{ influencer.website }}
+                            </p>
+                            {% endif %}
+
+                            {% if influencer.niche %}
+                            <p>
+                                <strong>Niche:</strong> <span class="badge text-bg-warning rounded-pill">{{ influencer.niche }}</span>
+                            </p>
+                            {% endif %}
+
+                            {% if influencer.audience_size %}
+                            <p>
+                                <strong>Audience size:</strong> {{ influencer.audience_size }}
+                            </p>
+                            {% endif %}
+
+                            {% if influencer.platforms %}
+                            <p>
+                                <strong>Platforms presence:</strong>
+                            <ul>
+                                {% for platform in influencer.platforms %}
+                                <li>
+                                    <p><strong>Platform: </strong>{{ platform.platform }}</p>
+                                    <p><strong>Username: </strong>{{ platform.username }}</p>
+                                    <p><strong>Profile url: </strong>{{ platform.url }}</p>
+                                    <p><strong>Followers Count: </strong>{{ platform.followers }}</p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            </p>
+                            {% endif %}
+                            <button class="btn btn-primary" onclick="handleSendAdInviteDialogToggle('{{ influencer.id }}')">Send Request</button>
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const handleSendAdInviteDialogToggle=(influencerId) => {
+
+        document.getElementById("send_ad_request_invite_influencer_id").value=influencerId;
+
+        const dialog=new bootstrap.Modal(document.getElementById('sendAdRequestInviteDialog'));
+        dialog.show();
+    }
+
+</script>
+{% endblock %}
