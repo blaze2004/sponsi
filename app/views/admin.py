@@ -132,3 +132,36 @@ def unflag_campaign():
     db.session.commit()
 
     return {"message": "Campaign unflagged successfully."}, 200
+
+
+@admin.route("/create-admin", methods=["POST"])
+@login_required
+def create_admin():
+    """Create admin handler."""
+
+    if current_user.role != UserRole.SUPERADMIN:
+        return {"message": "You are not allowed to perform this action."}, 403
+
+    email = request.json.get("email")
+    name = request.json.get("name")
+    password = request.json.get("password")
+
+    if not name:
+        return {"message": "Name is required."}, 400
+
+    if not email:
+        return {"message": "Email is required."}, 400
+
+    if not password:
+        return {"message": "Password is required."}, 400
+
+    if db.session.execute(db.select(User).where(User.email == email)).scalar():
+        return {"message": "User already exists."}, 400
+
+    user = User(email=email, role=UserRole.ADMIN, name=name)
+    user.set_password(password)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return {"message": "Admin created successfully."}, 200
