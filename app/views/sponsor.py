@@ -5,7 +5,13 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.forms.campaign import CreateOrUpdateAdRequestsForm, CreateOrUpdateCampaignForm
-from app.models.campaigns import AdRequest, Campaign, CampaignVisibility, Message
+from app.models.campaigns import (
+    AdRequest,
+    AdRequestStatus,
+    Campaign,
+    CampaignVisibility,
+    Message,
+)
 from app.models.user import User, UserRole
 from app.utils import db
 
@@ -333,7 +339,9 @@ def influencers():
     )
 
 
-@sponsor.route("/influencers/<int:influencer_id>/ad-request", methods=["POST"])
+@sponsor.route(
+    "/influencers/<int:influencer_id>/ad-request", methods=["POST", "DELETE"]
+)
 @login_required
 def invite_influencer_to_ad_request(influencer_id):
     """Invite influencer to ad request handler."""
@@ -364,6 +372,22 @@ def invite_influencer_to_ad_request(influencer_id):
 
     if ad_request.campaign.sponsor_id != current_user.id:
         return {"message": "You are not allowed to perform this action."}, 403
+
+    if request.method == "DELETE":
+        if (
+            ad_request.requested_by_id != influencer_id
+            and ad_request.requested_to_id != influencer_id
+        ):
+            return {"message": "Influencer is not invited."}, 400
+
+        if ad_request.requested_by_id == influencer_id:
+            ad_request.requested_by_id = None
+        else:
+            ad_request.requested_to_id = None
+
+        ad_request.status = AdRequestStatus.PENDING
+        db.session.commit()
+        return {"message": "Successfully removed ad request invite."}, 200
 
     ad_request.requested_to_id = influencer_id
     db.session.commit()
@@ -474,3 +498,36 @@ def chat(campaign_id, ad_request_id):
         campaign_name=ad_request.campaign.title,
         ad_request_name=ad_request.title,
     )
+
+
+@sponsor.route(
+    "/infleuncers/<int:influencer_id>/ad-request/<int:ad_request_id>/accept",
+    methods=["POST"],
+)
+@login_required
+def accept_ad_request(influencer_id, ad_request_id):
+    """Accept ad request handler."""
+
+    if current_user.role != UserRole.SPONSOR:
+        return {"message": "You are not allowed to perform this action."}, 403
+
+    ad_request = db.session.execute(
+        db.select(AdRequest).where(AdRequest.id == ad_request_id)
+    ).scalar()
+
+    if not ad_request:
+        return {"message": "Ad request not found."}, 404
+
+    if ad_request.campaign.sponsor_id != current_user.id:
+        return {"message": "You are not allowed to perform this action."}, 403
+
+    if ad_request.requested_by_id != influencer_id:
+        return {"message": "Invalid request."}, 400
+
+    ad_request.influencer_id = influencer_id
+    ad_request.status = AdRequestStatus.ACCEPTED
+    ad_request.requested_by_id = None
+    ad_request.requested_to_id = None
+    db.session.commit()
+
+    return {"message": "Ad request accepted successfully."}, 200

@@ -102,7 +102,116 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="requests-tab-pane" role="tabpanel" aria-labelledby="requests-tab" tabindex="0">
-                {{ placeholder('There are no Ad requests to display. Create a new ad request now', 'Create Ad Request') }}
+                <div class="accordion w-full" id="users-list-accordion">
+                    {% if new_ad_requests|length == 0 %}
+                    {{ placeholder('There are no Ad requests to display. Create a new ad request now', 'Create Ad Request') }}
+                    {% endif %}
+                    {% for request in new_ad_requests %}
+                    <div class="accordion-item border border-border rounded-md overflow-hidden mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button bg-background text-foreground d-flex flex-column flex-md-row gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ request.id }}" aria-controls="collapse-{{ request.id }}" aria-expanded="false">
+                                {{ request.title }} - {{ request.influencer.name }}
+                                <span class="badge text-bg-info rounded-pill">{{ request.influencer.audience_size }}+</span>
+                                <span class="badge text-bg-info rounded-pill">{{ request.influencer.niche }}+</span>
+                                {% if request.influencer.flagged %}
+                                <span class="badge bg-danger rounded-pill">Flagged</span>
+                                {% endif %}
+                            </button>
+                        </h2>
+
+                        <div id="collapse-{{ request.id }}" class="accordion-collapse collapse show bg-card text-card-foreground" data-bs-parent="#campaigns-list-accordion">
+                            <div class="accordion-body">
+                                <p>
+                                    <strong>Title:</strong> {{ request.title }}
+                                </p>
+                                <p>
+                                    <strong>Description:</strong> {{ request.description }}
+                                </p>
+                                <p>
+                                    <strong>Campaign Name:</strong> {{ request.campaign }}
+                                </p>
+
+                                {% if request.influencer.flagged %}
+                                <p>
+                                    <strong>Flagged:</strong> <span class="badge bg-danger rounded-pill">{{ request.influencer.flagged }}</span>
+                                </p>
+                                {% endif %}
+
+                                <p>
+                                    <strong>Influencer Niche:</strong> <span class="badge text-bg-warning rounded-pill">{{ request.influencer.niche }}</span>
+                                </p>
+                                <p>
+                                    <strong>Influencer Name:</strong> {{ request.influencer.name }}
+                                </p>
+                                <p>
+                                    <strong>Influencer Portfolio:</strong> {{ request.influencer.website }}
+                                </p>
+
+                                {% if request.influencer.platforms %}
+                                <p>
+                                    <strong>Platforms presence:</strong>
+                                <ul>
+                                    {% for platform in request.influencer.platforms %}
+                                    <li>
+                                        <p><strong>Platform: </strong>{{ platform.platform }}</p>
+                                        <p><strong>Username: </strong>{{ platform.username }}</p>
+                                        <p><strong>Profile url: </strong>{{ platform.url }}</p>
+                                        <p><strong>Followers Count: </strong>{{ platform.followers }}</p>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                </p>
+                                {% endif %}
+
+                                {% if request.influencer.received %}
+                                <div class="modal" tabindex="-1" id="acceptAdRequestFromInfluencer-{{ request.id }}-{{ request.influencer.id }}">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-card">
+                                            <div class="modal-body">
+                                                <h5 class="modal-title my-2">Accept request</h5>
+                                                <div class="my-4">
+                                                    <p>Are you sure you want to accept this request?</p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button id="accept-request-{{ request.id }}-{{ request.influencer.id }}-button" data-loading="false" type="button" class="btn btn-primary loader-container" onclick="callApi({url: `{{ url_for('sponsor.accept_ad_request', influencer_id=request.influencer.id, ad_request_id=request.id) }}`, loadingElementId: 'accept-request-{{ request.id }}-{{ request.influencer.id }}-button', refreshOnSuccess: true, options: { method: 'POST' }});">
+                                                    <span class="children">Accept</span>
+                                                    {% include 'ui/spinner.html' %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#acceptAdRequestFromInfluencer-{{ request.id }}-{{ request.influencer.id }}">Accept</button>
+                                {% endif %}
+                                <div class="modal" tabindex="-1" id="rejectAdRequestFromInfluencer-{{ request.id }}-{{ request.influencer.id }}">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-card">
+                                            <div class="modal-body">
+                                                <h5 class="modal-title my-2">Reject request</h5>
+                                                <div class="my-4">
+                                                    <p>Are you sure you want to reject this request?</p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button id="reject-request-{{ request.id }}-{{ request.influencer.id }}-button" data-loading="false" type="button" class="btn btn-danger loader-container" onclick="callApi({url: `{{ url_for('sponsor.invite_influencer_to_ad_request', influencer_id=request.influencer.id) }}`, loadingElementId: 'reject-request-{{ request.id }}-{{ request.influencer.id }}-button', refreshOnSuccess: true, options: { method: 'DELETE', body: JSON.stringify({ ad_request_id: '{{ request.id }}'}) }});">
+                                                    <span class="children">Delete</span>
+                                                    {% include 'ui/spinner.html' %}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectAdRequestFromInfluencer-{{ request.id }}-{{ request.influencer.id }}">Reject</button>
+                                <a href="{{ url_for('sponsor.chat', campaign_id=request.campaign_id, ad_request_id=request.id) }}" class="btn btn-primary">Negotiate</a>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

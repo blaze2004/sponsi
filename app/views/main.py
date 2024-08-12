@@ -3,7 +3,12 @@
 from datetime import datetime
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
-from app.models.campaigns import AdRequest, Campaign, CampaignVisibility
+from app.models.campaigns import (
+    AdRequest,
+    AdRequestStatus,
+    Campaign,
+    CampaignVisibility,
+)
 from app.models.user import User, UserRole
 from app.utils import db
 
@@ -57,33 +62,33 @@ def dashboard():
                 }
             )
 
-        for campaign in campaigns:
+        for request in campaigns:
             campaigns_data.append(
                 {
-                    "id": campaign.id,
-                    "title": campaign.title,
-                    "description": campaign.description,
-                    "start_date": datetime.strftime(campaign.start_date, "%Y-%m-%d"),
-                    "end_date": datetime.strftime(campaign.end_date, "%Y-%m-%d"),
-                    "budget": campaign.budget,
-                    "visibility": campaign.visibility.name,
-                    "niche": campaign.niche,
-                    "goals": campaign.goals,
-                    "created_at": campaign.created_at,
-                    "flagged": campaign.flagged,
-                    "flagged_reason": campaign.flagged_reason,
+                    "id": request.id,
+                    "title": request.title,
+                    "description": request.description,
+                    "start_date": datetime.strftime(request.start_date, "%Y-%m-%d"),
+                    "end_date": datetime.strftime(request.end_date, "%Y-%m-%d"),
+                    "budget": request.budget,
+                    "visibility": request.visibility.name,
+                    "niche": request.niche,
+                    "goals": request.goals,
+                    "created_at": request.created_at,
+                    "flagged": request.flagged,
+                    "flagged_reason": request.flagged_reason,
                     "sponsor": {
-                        "id": campaign.user.id,
-                        "name": campaign.user.name,
-                        "email": campaign.user.email,
-                        "role": campaign.user.role.name,
-                        "about": campaign.user.about,
-                        "flagged": campaign.user.flagged,
-                        "flagged_reason": campaign.user.flagged_reason,
-                        "onboarded": campaign.user.onboarded,
-                        "website": campaign.user.website,
-                        "company_name": campaign.user.company_name,
-                        "industry": campaign.user.industry,
+                        "id": request.user.id,
+                        "name": request.user.name,
+                        "email": request.user.email,
+                        "role": request.user.role.name,
+                        "about": request.user.about,
+                        "flagged": request.user.flagged,
+                        "flagged_reason": request.user.flagged_reason,
+                        "onboarded": request.user.onboarded,
+                        "website": request.user.website,
+                        "company_name": request.user.company_name,
+                        "industry": request.user.industry,
                     },
                 }
             )
@@ -125,27 +130,180 @@ def dashboard():
 
         campaigns_data = []
 
-        for campaign in campaigns:
-            if campaign.end_date < datetime.now():
+        for request in campaigns:
+            if request.end_date < datetime.now():
                 continue
             campaigns_data.append(
                 {
-                    "id": campaign.id,
-                    "title": campaign.title,
-                    "description": campaign.description,
-                    "start_date": datetime.strftime(campaign.start_date, "%Y-%m-%d"),
-                    "end_date": datetime.strftime(campaign.end_date, "%Y-%m-%d"),
-                    "budget": campaign.budget,
-                    "visibility": campaign.visibility.name,
-                    "niche": campaign.niche,
-                    "goals": campaign.goals,
-                    "created_at": campaign.created_at,
-                    "flagged": campaign.flagged,
-                    "flagged_reason": campaign.flagged_reason,
+                    "id": request.id,
+                    "title": request.title,
+                    "description": request.description,
+                    "start_date": datetime.strftime(request.start_date, "%Y-%m-%d"),
+                    "end_date": datetime.strftime(request.end_date, "%Y-%m-%d"),
+                    "budget": request.budget,
+                    "visibility": request.visibility.name,
+                    "niche": request.niche,
+                    "goals": request.goals,
+                    "created_at": request.created_at,
+                    "flagged": request.flagged,
+                    "flagged_reason": request.flagged_reason,
                 }
             )
-        return render_template("dashboard/sponsor.html", campaigns=campaigns_data)
-    return render_template("dashboard/influencer.html")
+
+        new_ad_requests = db.session.execute(
+            db.select(AdRequest)
+            .join(Campaign)
+            .where(
+                (Campaign.sponsor_id == current_user.id),
+                (AdRequest.influencer_id == None),
+            )
+        ).scalars()
+
+        new_ad_requests_data = []
+
+        for ad_request in new_ad_requests:
+            if (
+                ad_request.requested_by_id is None
+                and ad_request.requested_to_id is None
+            ):
+                continue
+
+            new_ad_requests_data.append(
+                {
+                    "id": ad_request.id,
+                    "title": ad_request.title,
+                    "description": ad_request.description,
+                    "campaign_id": ad_request.campaign_id,
+                    "campaign": ad_request.campaign.title,
+                    "influencer_id": (
+                        ad_request.requested_by_id
+                        if ad_request.requested_by_id
+                        else ad_request.requested_to_id
+                    ),
+                    "influencer": {
+                        "id": (
+                            ad_request.requested_by.id
+                            if ad_request.requested_by
+                            else ad_request.requested_to.id
+                        ),
+                        "name": (
+                            ad_request.requested_by.name
+                            if ad_request.requested_by
+                            else ad_request.requested_to.name
+                        ),
+                        "flagged": (
+                            ad_request.requested_by.flagged
+                            if ad_request.requested_by
+                            else ad_request.requested_to.flagged
+                        ),
+                        "website": (
+                            ad_request.requested_by.website
+                            if ad_request.requested_by
+                            else ad_request.requested_to.website
+                        ),
+                        "niche": (
+                            ad_request.requested_by.niche
+                            if ad_request.requested_by
+                            else ad_request.requested_to.niche
+                        ),
+                        "audience_size": (
+                            ad_request.requested_by.audience_size
+                            if ad_request.requested_by
+                            else ad_request.requested_to.audience_size
+                        ),
+                        "platforms": [
+                            {
+                                "platform": platform.platform,
+                                "username": platform.username,
+                                "url": platform.url,
+                                "followers": platform.followers,
+                            }
+                            for platform in (
+                                ad_request.requested_by.platforms
+                                if ad_request.requested_by
+                                else ad_request.requested_to.platforms
+                            )
+                        ],
+                        "received": (True if ad_request.requested_by else False),
+                    },
+                }
+            )
+
+        print(new_ad_requests_data)
+        return render_template(
+            "dashboard/sponsor.html",
+            campaigns=campaigns_data,
+            new_ad_requests=new_ad_requests_data,
+        )
+
+    campaigns = db.session.execute(
+        db.select(AdRequest)
+        .join(Campaign)
+        .where(
+            (Campaign.end_date > datetime.now()),
+            (AdRequest.influencer_id == current_user.id)
+            | (AdRequest.requested_by_id == current_user.id)
+            | (AdRequest.requested_to_id == current_user.id),
+        )
+    ).scalars()
+
+    campaigns_data = []
+
+    new_ad_requests_data = []
+
+    for request in campaigns:
+        if request.status.name == AdRequestStatus.ACCEPTED.name:
+            campaigns_data.append(
+                {
+                    "id": request.id,
+                    "title": request.title,
+                    "description": request.description,
+                    "start_date": datetime.strftime(
+                        request.campaign.start_date, "%Y-%m-%d"
+                    ),
+                    "end_date": datetime.strftime(
+                        request.campaign.end_date, "%Y-%m-%d"
+                    ),
+                    "payment_amount": request.payment_amount,
+                    "niche": request.campaign.niche,
+                    "requirements": request.requirements,
+                    "flagged": request.campaign.flagged,
+                    "sponsor": {
+                        "id": request.campaign.user.id,
+                        "name": request.campaign.user.name,
+                        "website": request.campaign.user.website,
+                        "company_name": request.campaign.user.company_name,
+                    },
+                }
+            )
+        else:
+            new_ad_requests_data.append(
+                {
+                    "id": request.id,
+                    "title": request.title,
+                    "description": request.description,
+                    "niche": request.campaign.niche,
+                    "campaign": request.campaign.title,
+                    "campaign_id": request.campaign.id,
+                    "payment_amount": request.payment_amount,
+                    "requirements": request.requirements,
+                    "flagged": request.campaign.flagged,
+                    "sponsor": {
+                        "id": request.campaign.user.id,
+                        "name": request.campaign.user.name,
+                        "website": request.campaign.user.website,
+                        "company_name": request.campaign.user.company_name,
+                    },
+                    "received": (
+                        True if request.requested_to_id == current_user.id else False
+                    ),
+                }
+            )
+    return render_template(
+        "dashboard/influencer.html",
+        campaigns=campaigns_data,
+        new_ad_requests=new_ad_requests_data,
+    )
 
 
 @main.route("/stats")
@@ -360,7 +518,7 @@ def stats():
         )
 
     ad_requests = db.session.execute(
-        db.select(AdRequest).where(AdRequest.requested_to_id == current_user.id)
+        db.select(AdRequest).where(AdRequest.influencer_id == current_user.id)
     ).scalars()
 
     ad_requests_data = []
@@ -368,7 +526,7 @@ def stats():
     earning = 0
 
     for ad_request in ad_requests:
-        if ad_request.status.name == "ACCEPTED":
+        if ad_request.status.name == AdRequestStatus.ACCEPTED.name:
             earning += ad_request.payment_amount
         ad_requests_data.append(
             {
