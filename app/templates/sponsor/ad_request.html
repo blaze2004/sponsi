@@ -92,6 +92,7 @@
                             </div>
                             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAdRequestModal">Delete</button>
                             <button class="btn btn-secondary" onclick='handleEditAdRequest({ url: `{{ url_for("sponsor.edit_or_delete_ad_request", campaign_id=campaign.id, ad_request_id=ad_request.id) }}`, data: `{{ ad_request | tojson | safe }}`})'>Edit Ad Request</button>
+                            <a href="{{ url_for('sponsor.chat', campaign_id=campaign.id, ad_request_id=ad_request.id) }}" class="btn btn-primary">Chat</a>
                         </div>
                     </div>
 

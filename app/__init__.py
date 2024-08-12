@@ -24,11 +24,18 @@ def create_app():
     def before_request():
         return middleware()
 
-    from app.views import main, auth, admin, sponsor  # pylint: disable=import-outside-toplevel
+    from app.views import (
+        main,
+        auth,
+        admin,
+        sponsor,
+        influencer,
+    )  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix="/auth")
     app.register_blueprint(admin, url_prefix="/admin")
     app.register_blueprint(sponsor, url_prefix="/sponsor")
+    app.register_blueprint(influencer, url_prefix="/influencer")
 
     return app

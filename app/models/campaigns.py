@@ -26,12 +26,18 @@ class Message(db.Model):
     __tablename__ = "message"
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.Text, nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     sender_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     ad_request_id = db.Column(
         db.Integer, db.ForeignKey("ad_request.id"), nullable=False
     )
 
-    sender = db.relationship("User", backref="messages", lazy=True)
+    sender = db.relationship(
+        "User", foreign_keys=[sender_id], backref="messages", lazy=True
+    )
+    receiver = db.relationship(
+        "User", foreign_keys=[receiver_id], backref="received_messages", lazy=True
+    )
 
 
 class Campaign(db.Model):

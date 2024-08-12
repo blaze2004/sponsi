@@ -1,0 +1,61 @@
+{% extends 'layout/influencer_base.html' %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center min-h-screen p-2">
+    <div class="d-flex flex-column align-items-center align-items-md-start justify-content-center max-w-screen-xl w-full">
+        <h1 class="fs-1 fw-bold text-center mb-4">
+            Welcome, {{ current_user.name }}
+        </h1>
+
+        <p class="lead text-center mb-3">
+            Here you can view campaigns and ad status statistics.
+        </p>
+
+        <p class="lead text-center mb-3">
+            <strong>Earnings: </strong>{{ earning }}
+        </p>
+
+        <div class="d-flex w-full flex-column flex-md-row gap-2 my-2">
+            <canvas id="ad_request_distribution_by_sponsor" class="max-h-md max-w-screen-sm"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<script src="{{url_for('static',filename='js/chart.umd.min.js')}}"></script>
+
+<script>
+
+    const renderStatsCharts=() => {
+
+        const ad_request_distribution_by_sponsor=document.getElementById('ad_request_distribution_by_sponsor');
+        const ad_request_distribution_by_sponsor_data=JSON.parse('{{ ad_request_distribution_by_sponsor | tojson | safe }}');
+
+        if (Object.keys(ad_request_distribution_by_sponsor_data).length>0) {
+            console.log(Object.keys(ad_request_distribution_by_sponsor_data).map((key) => key.charAt(0).toUpperCase()+key.slice(1)))
+            new Chart(ad_request_distribution_by_sponsor, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(ad_request_distribution_by_sponsor_data).map((key) => key.charAt(0).toUpperCase()+key.slice(1)),
+                    datasets: [{
+                        label: 'Ad Requests',
+                        data: Object.values(ad_request_distribution_by_sponsor_data),
+                    }],
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Ad Request Distribution by Sponsor',
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    window.onload=renderStatsCharts;
+
+</script>
+{% endblock %}

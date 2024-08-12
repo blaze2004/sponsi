@@ -1,0 +1,64 @@
+{% extends 'layout/sponsor_base.html' %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center min-h-screen p-2">
+    <div class="d-flex flex-column align-items-center align-items-md-start justify-content-center max-w-screen-xl w-full">
+        <h1 class="fs-1 fw-bold text-center mb-4">
+            Campaign - {{ campaign_name }}
+        </h1>
+
+        <h2 class="fs-2 fw-bold text-center mb-4">
+            Ad Request - {{ ad_request_name }}
+        </h2>
+
+        <div class="w-full my-2">
+            {% for message in messages %}
+            {% if message.sender_id == current_user.id %}
+            <div class="d-flex justify-content-end mb-2">
+                <div class="max-w-screen-sm">
+                    <div class="d-flex gap-1">
+                        Sent to:
+                        <img src="https://api.dicebear.com/9.x/initials/svg?seed={{ message.receiver_name }}" alt="User Avatar" class="rounded-circle" width="30" height="30">
+                        <p class="fw-medium">{{ message.receiver_name }}</p>
+                    </div>
+                    <div class="bg-primary text-white p-2 rounded-3">
+                        {{ message.message }}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="d-flex justify-content-start mb-2">
+                <div class="max-w-screen-sm">
+                    <div class="d-flex gap-1">
+                        <img src="https://api.dicebear.com/9.x/initials/svg?seed={{ message.sender_name }}" alt="User Avatar" class="rounded-circle" width="30" height="30">
+                        <p class="fw-medium">{{ message.sender_name }}</p>
+                    </div>
+                    <div class="bg-secondary text-white p-2 rounded-3">
+                        {{ message.message }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <form method="POST" class="w-full">
+            <div class="mb-4">
+                <label for="receiver_id" class="d-block fw-medium mb-2">Send to</label>
+                <select name="receiver_id" required aria-label="receiver_id" class="input">
+                    <option value="" selected disabled>Select receiver</option>
+                    {% for user in receivers %}
+                    <option value="{{ user.id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="d-flex w-full">
+                <textarea type="text" name="message" class="input" required placeholder="Type a message..."></textarea>
+                <button type="submit" class="btn btn-primary ms-2">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

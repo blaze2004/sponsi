@@ -5,7 +5,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.forms.campaign import CreateOrUpdateAdRequestsForm, CreateOrUpdateCampaignForm
-from app.models.campaigns import AdRequest, Campaign, CampaignVisibility
+from app.models.campaigns import AdRequest, Campaign, CampaignVisibility, Message
 from app.models.user import User, UserRole
 from app.utils import db
 
@@ -369,3 +369,108 @@ def invite_influencer_to_ad_request(influencer_id):
     db.session.commit()
 
     return {"message": "Successfully sent ad request invite."}, 200
+
+
+@sponsor.route(
+    "/campaigns/<int:campaign_id>/ad_request/<int:ad_request_id>/chat",
+    methods=["GET", "POST"],
+)
+@login_required
+def chat(campaign_id, ad_request_id):
+    """Chat with influencer handler."""
+
+    if current_user.role not in (UserRole.SPONSOR, UserRole.INFLUENCER):
+        return redirect(url_for("main.dashboard"))
+
+    ad_request = db.session.execute(
+        db.select(AdRequest).where(AdRequest.id == ad_request_id)
+    ).scalar()
+
+    if not ad_request:
+        flash("Ad request not found.", "danger")
+        return redirect(
+            url_for("sponsor.campaign_ad_requests", campaign_id=campaign_id)
+        )
+
+    messages = []
+    receivers = {}
+
+    if request.method == "POST":
+        message = request.form.get("message")
+        receiver_id = request.form.get("receiver_id")
+
+        if message and receiver_id:
+
+            new_message = Message(
+                message=message,
+                receiver_id=receiver_id,
+                sender_id=current_user.id,
+                ad_request_id=ad_request_id,
+            )
+
+            db.session.add(new_message)
+            db.session.commit()
+            flash("Message sent successfully.", "success")
+        else:
+            flash("Message cannot be empty.", "danger")
+
+    for msg in ad_request.messages:
+        if current_user.role == UserRole.SPONSOR:
+            if msg.sender_id != current_user.id and msg.sender_id not in receivers:
+                receivers[msg.sender_id] = msg.sender.name
+
+            if msg.receiver_id != current_user.id and msg.receiver_id not in receivers:
+                receivers[msg.receiver_id] = msg.receiver.name
+
+            messages.append(
+                {
+                    "id": msg.id,
+                    "message": msg.message,
+                    "receiver_id": msg.receiver_id,
+                    "sender_id": msg.sender_id,
+                    "sender_name": msg.sender.name,
+                    "receiver_name": msg.receiver.name,
+                }
+            )
+        elif current_user.role == UserRole.INFLUENCER:
+            if msg.receiver_id == current_user.id or msg.sender_id == current_user.id:
+                if msg.sender_id != current_user.id and msg.sender_id not in receivers:
+                    receivers[msg.sender_id] = msg.sender.name
+
+                if (
+                    msg.receiver_id != current_user.id
+                    and msg.receiver_id not in receivers
+                ):
+                    receivers[msg.receiver_id] = msg.receiver.name
+                messages.append(
+                    {
+                        "id": msg.id,
+                        "message": msg.message,
+                        "receiver_id": msg.receiver_id,
+                        "sender_id": msg.sender_id,
+                        "sender_name": msg.sender.name,
+                        "receiver_name": msg.receiver.name,
+                    }
+                )
+
+    if ad_request.requested_to_id and ad_request.requested_to_id != current_user.id:
+        if ad_request.requested_to_id not in receivers:
+            receivers[ad_request.requested_to_id] = ad_request.requested_to.name
+
+    if ad_request.requested_by_id and ad_request.requested_by_id != current_user.id:
+        if ad_request.requested_by_id not in receivers:
+            receivers[ad_request.requested_by_id] = ad_request.requested_by.name
+
+    if ad_request.influencer_id and ad_request.infleuncer_id != current_user.id:
+        if ad_request.influencer_id not in receivers:
+            receivers[ad_request.influencer_id] = ad_request.influencer.name
+
+    receivers = [{"id": k, "name": v} for k, v in receivers.items()]
+
+    return render_template(
+        "sponsor/chat.html",
+        messages=messages,
+        receivers=receivers,
+        campaign_name=ad_request.campaign.title,
+        ad_request_name=ad_request.title,
+    )

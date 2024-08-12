@@ -358,4 +358,37 @@ def stats():
             campaign_distribution_by_flagged_status=campaign_distribution_by_flagged_status,
             ad_request_distribution_by_influencer=ad_request_distribution_by_influencer,
         )
-    return render_template("stats/influencer.html")
+
+    ad_requests = db.session.execute(
+        db.select(AdRequest).where(AdRequest.requested_to_id == current_user.id)
+    ).scalars()
+
+    ad_requests_data = []
+
+    earning = 0
+
+    for ad_request in ad_requests:
+        if ad_request.status.name == "ACCEPTED":
+            earning += ad_request.payment_amount
+        ad_requests_data.append(
+            {
+                "id": ad_request.id,
+                "status": ad_request.status.name,
+                "campaign_id": ad_request.campaign_id,
+                "sponsor_id": ad_request.campaign.sponsor_id,
+                "sponsor": ad_request.campaign.user.name,
+            }
+        )
+
+    ad_request_distribution_by_sponsor = {}
+    for ad_request in ad_requests_data:
+        sponsor_id = str(ad_request["sponsor_id"]) + "-" + ad_request["sponsor"]
+        if sponsor_id not in ad_request_distribution_by_sponsor:
+            ad_request_distribution_by_sponsor[sponsor_id] = 0
+        ad_request_distribution_by_sponsor[sponsor_id] += 1
+
+    return render_template(
+        "stats/influencer.html",
+        earning=earning,
+        ad_request_distribution_by_sponsor=ad_request_distribution_by_sponsor,
+    )
