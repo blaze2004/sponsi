@@ -1,8 +1,8 @@
 """App Entrypoint"""
 
 import os
-from app import create_app, db
-from app.models.user import create_superadmin
+from src.app import create_app, db
+from src.app.models.user import create_superadmin
 
 app = create_app()
 

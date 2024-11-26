@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/flask,visualstudiocode
-# Edit at https://www.toptal.com/developers/gitignore?templates=flask,visualstudiocode
+# Created by https://www.toptal.com/developers/gitignore/api/flask,visualstudiocode,vuejs
+# Edit at https://www.toptal.com/developers/gitignore?templates=flask,visualstudiocode,vuejs
 
 ### Flask ###
 instance/*
@@ -186,4 +186,26 @@ cython_debug/
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/flask,visualstudiocode
+### Vuejs ###
+# Recommended template: Node.gitignore
+
+logs
+npm-debug.log*
+yarn-error.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+/cypress/videos/
+/cypress/screenshots/
+
+*.tsbuildinfo
+
+# End of https://www.toptal.com/developers/gitignore/api/flask,visualstudiocode,vuejs
