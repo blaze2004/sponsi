@@ -208,4 +208,6 @@ coverage
 
 *.tsbuildinfo
 
+*.turbo
+
 # End of https://www.toptal.com/developers/gitignore/api/flask,visualstudiocode,vuejs

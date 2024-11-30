@@ -9,8 +9,6 @@ Simple flask and vue application to connect sponsors and influencers.
 python -m virtualenv venv
 source ./venv/bin/activate
 
-pip install -r requirements.txt
 pnpm install
-
 pnpm dev
 ```
