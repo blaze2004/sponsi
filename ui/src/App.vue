@@ -1,20 +1,17 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/images/logo.png" width="125" height="125" />
+    <Navbar />
+    <Toaster position="top-center" :rich-colors="true" />
 
-    <div class="wrapper">
-      <p msg="You did it!" ></p>
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+    <div style="padding-top: 5.2rem">
+        <RouterView />
     </div>
-  </header>
 
-  <RouterView />
+    <Footer />
 </template>
+
+<script setup>
+import { RouterView } from 'vue-router';
+import Navbar from './components/Navbar.vue';
+import Footer from './components/Footer.vue';
+import { Toaster } from 'vue-sonner';
+</script>

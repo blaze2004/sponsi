@@ -4,7 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "turbo dev",
-        "build": "turbo build"
+        "build": "turbo build",
+        "format": "turbo format"
     },
     "dependencies": {
         "turbo": "^2.3.3"

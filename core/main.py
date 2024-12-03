@@ -31,17 +31,11 @@ def create_app():
 
     from api.routes import (
         main,
-        auth,
-        # admin,
-        # sponsor,
-        # influencer,
+        api,
     )  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(main)
-    app.register_blueprint(auth, url_prefix="/auth")
-    # app.register_blueprint(admin, url_prefix="/admin")
-    # app.register_blueprint(sponsor, url_prefix="/sponsor")
-    # app.register_blueprint(influencer, url_prefix="/influencer")
+    app.register_blueprint(api, url_prefix="/api")
 
     return app
 

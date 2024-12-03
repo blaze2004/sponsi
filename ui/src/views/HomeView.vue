@@ -1,5 +1,13 @@
 <template>
-  <main>
-    <p>Hi</p>
-  </main>
+    <div>
+        <div class="d-flex flex-column align-items-center justify-content-center pt-16 min-h-screen">
+            <h1 class="fs-1 fw-bold text-center mb-4 mx-auto max-w-screen-md">Connecting brands with creators.</h1>
+
+            <p class="lead text-center mb-3 mx-auto max-w-screen-sm">
+                Sponsi is a platform to connect brands with creators to create authentic and engaging content.
+            </p>
+
+            <RouterLink to="/signin" class="btn btn-primary"> Get Started </RouterLink>
+        </div>
+    </div>
 </template>
